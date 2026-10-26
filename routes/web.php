@@ -24,3 +24,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+//rutas para ajustes
+Route::get('/admin/ajustes', [App\Http\Controllers\AjusteController::class, 'index'])
+    ->middleware('auth')
+    ->name('admin.ajustes.index');

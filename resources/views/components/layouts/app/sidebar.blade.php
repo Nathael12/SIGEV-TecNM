@@ -14,7 +14,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Platform" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>Inicio</flux:navlist.item>
-                    <flux:navlist.item icon="cog-6-tooth" :href="route('dashboard')" :current="request()->routeIs('ajustes')" wire:navigate>{{ __('Ajustes') }}</flux:navlist.item>
+                    <flux:navlist.item icon="cog-6-tooth" :href="route('admin.ajustes.index')" :current="request()->routeIs('admin.ajustes.index')" wire:navigate>{{ __('Ajustes') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
