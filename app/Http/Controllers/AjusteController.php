@@ -2,64 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ajuste;
 use Illuminate\Http\Request;
 
 class AjusteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
+    public function index(){
         return view('admin.ajustes.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Ajuste $ajuste)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Ajuste $ajuste)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Ajuste $ajuste)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Ajuste $ajuste)
-    {
-        //
+    public function store(Request $request){
+        //validar los datos
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            /*'descripcion' => 'nullable|string|max:255',
+            'direccion' => 'required|string|max:255',
+            'telefono' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'divisa' => 'required|string|max:10',
+            'logo' => 'nullable|string|max:255',
+            'web' => 'nullable|string|max:255',
+            'interes' => 'required|numeric|min:0|max:100',
+            'mora' => 'required|numeric|min:0|max:100',*/
+        ]);
     }
 }
