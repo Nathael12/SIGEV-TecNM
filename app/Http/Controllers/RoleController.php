@@ -50,7 +50,10 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+       // echo "Mostrando el rol con id:" . $id;
+       $rol = Role::find($id);
+       //return response()->json($rol);
+       return view('admin.roles.show', compact('rol'));
     }
 
     /**
