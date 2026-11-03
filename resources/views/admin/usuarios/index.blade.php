@@ -1,120 +1,162 @@
-<x-layouts.app :title="__('Usuarios')">
-    <div class="flex flex-col gap-6">
-
-        {{-- Título --}}
-
-        <div class="border-b border-zinc-200 pb-4 dark:border-zinc-700">
-            <h1 class="text-2xl font-semibold text-zinc-800 dark:text-white">Usuarios del sistema</h1>
-        </div>
-
-        {{-- Botón crear --}}
-        <div class="flex items-center justify-between gap-4">
-            <button type="button"
-                class="flex items-center gap-2 rounded-lg bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-600">
-                <flux:icon.plus class="size-4" />
-                Crear nuevo
-            </button>
-        </div>
-
-        {{-- Tabla --}}
-        <div class="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
-            <table class="w-full text-sm">
-                <thead class="bg-zinc-50 text-xs uppercase text-zinc-600">
-                    <tr>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-center">Nro</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-left">Nombre(s)</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-left">Apellido paterno</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-left">Apellido materno</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-left">Correo</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-left">Teléfono</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-center">Rol</th>
-                        <th class="border-b border-r border-zinc-200 px-4 py-3 text-center">Estado</th>
-                        <th class="border-b border-zinc-200 px-4 py-3 text-center">Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody class="text-zinc-700">
-
-                    {{-- Fila de ejemplo 1 --}}
-                    <tr class="border-b border-zinc-200">
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">1</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Juan</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Pérez</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">López</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">juan@correo.com</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">9611234567</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">Jefe de flotilla</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">
-                            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Activo</span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center justify-center gap-2">
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600">
-                                    <flux:icon.pencil-square class="size-4" /> Editar
-                                </button>
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600">
-                                    <flux:icon.no-symbol class="size-4" /> Desactivar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Fila de ejemplo 2 --}}
-                    <tr class="border-b border-zinc-200">
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">2</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">María</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Gómez</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Ruiz</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">maria@correo.com</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">9617654321</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">Jefe de flotilla</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">
-                            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Activo</span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center justify-center gap-2">
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600">
-                                    <flux:icon.pencil-square class="size-4" /> Editar
-                                </button>
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-600">
-                                    <flux:icon.no-symbol class="size-4" /> Desactivar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Fila de ejemplo 3 (inactivo) --}}
-                    <tr class="border-b border-zinc-200">
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">3</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Carlos</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Díaz</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">Mora</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">carlos@correo.com</td>
-                        <td class="border-r border-zinc-200 px-4 py-3">9619988776</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">Jefe de flotilla</td>
-                        <td class="border-r border-zinc-200 px-4 py-3 text-center">
-                            <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Inactivo</span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center justify-center gap-2">
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-green-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-600">
-                                    <flux:icon.pencil-square class="size-4" /> Editar
-                                </button>
-                                <button type="button"
-                                    class="flex items-center gap-1.5 rounded-md bg-blue-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-600">
-                                    <flux:icon.check-circle class="size-4" /> Activar
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
+<x-layouts.app title="Usuarios del sistema">
+    <div class="relative mb-6 w-full">
+        <flux:heading size="xl" level="1">Usuarios del sistema</flux:heading>
+        <br>
+        <flux:separator variant="subtle" />
     </div>
+
+    <div class="flex justify-end">
+        <a href="{{ url('/admin/usuarios/create') }}"
+            class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition">
+            <i class="fas fa-plus mr-2"></i>
+            Crear nuevo
+        </a>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 mt-6">
+        <table class="w-full min-w-full border-collapse" style="width: 100%;">
+            <thead class="bg-gray-50 dark:bg-zinc-900 text-center">
+                <tr>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Nro</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Rol</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Nombres y apellidos</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Correo</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Teléfono</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Estado</th>
+                    <th
+                        class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-zinc-800">
+                @forelse ($usuarios as $usuario)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition">
+                        {{-- Nro --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                            {{ $loop->iteration }}</td>
+
+                        {{-- Rol --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                            {{ $usuario->roles->pluck('name')->join(', ') }}</td>
+
+                        {{-- Nombres y apellidos --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            {{ $usuario->nombre_usuario }} {{ $usuario->apellido_paterno }}
+                            {{ $usuario->apellido_materno }}</td>
+
+                        {{-- Correo --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            {{ $usuario->correo_usuario }}</td>
+
+                        {{-- Teléfono --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 text-center">
+                            {{ $usuario->telefono_usuario }}</td>
+
+                        {{-- Estado: depende de si está eliminado (deleted_at) --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-center">
+                            @if ($usuario->deleted_at)
+                                <span
+                                    class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Inactivo</span>
+                            @else
+                                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full"
+                                    style="color: #15803d; background-color: #dcfce7;">Activo</span>
+                            @endif
+                        </td>
+
+                        {{-- Acciones --}}
+                        <td
+                            class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-center">
+                            <div class="flex justify-center gap-2">
+
+                                @if ($usuario->deleted_at)
+                                    {{-- Usuario eliminado: solo Restaurar --}}
+                                    <form action="{{ url('/admin/usuario/' . $usuario->id . '/restaurar') }}"
+                                        method="post"
+                                        onsubmit="confirmarAccion(event, this, '¿Desea restaurar este registro?', 'Restaurar', '#a68d1e')">
+                                        @csrf
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold rounded transition">
+                                            <i class="fas fa-undo-alt mr-2"></i> Restaurar
+                                        </button>
+                                    </form>
+                                @else
+                                    {{-- Ver --}}
+                                    <a href="{{ url('/admin/usuario/' . $usuario->id) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-xs font-semibold rounded transition">
+                                        <i class="fas fa-eye mr-2"></i> Ver
+                                    </a>
+
+                                    {{-- Editar --}}
+                                    <a href="{{ url('/admin/usuario/' . $usuario->id . '/edit') }}"
+                                        class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
+                                        <i class="fas fa-pencil-alt mr-2"></i> Editar
+                                    </a>
+
+                                    {{-- Eliminar --}}
+                                    <form action="{{ url('/admin/usuario/' . $usuario->id) }}" method="post"
+                                        onsubmit="confirmarAccion(event, this, '¿Desea eliminar este registro?', 'Eliminar', '#a5161d')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition">
+                                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                        </button>
+                                    </form>
+                                @endif
+
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7"
+                            class="px-3 py-6 border border-gray-200 dark:border-zinc-700 text-center text-sm text-gray-500">
+                            No hay usuarios registrados.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Script único de confirmación (sirve para eliminar y restaurar) --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarAccion(event, form, titulo, textoBoton, colorBoton) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: titulo,
+                icon: 'question',
+                showDenyButton: true,
+                confirmButtonText: textoBoton,
+                confirmButtonColor: colorBoton,
+                denyButtonColor: '#270a0a',
+                denyButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
+
 </x-layouts.app>

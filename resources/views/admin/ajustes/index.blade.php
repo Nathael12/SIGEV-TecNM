@@ -15,7 +15,7 @@
                 <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
 
                     <div class="min-w-0">
-                        <flux:label>Nombre de la Empresa <span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
+                        <flux:label>Nombre de la empresa<span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
                         <flux:input name="nombre" icon="building-office" placeholder="Nombre Comercial" required />
                         <flux:error name="nombre" />
                     </div>
