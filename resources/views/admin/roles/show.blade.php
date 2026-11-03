@@ -5,7 +5,7 @@
             <flux:breadcrumbs.item href="{{ url('/admin/roles') }}">Listado de roles</flux:breadcrumbs.item>
             <flux:breadcrumbs.item>Datos de rol: {{ $rol->name }} </flux:breadcrumbs.item>
         </flux:breadcrumbs>
-        <flux:heading size="xl" level="1" class="mt-4">Crear un nuevo rol</flux:heading>
+        <flux:heading size="xl" level="1" class="mt-4">Detalle ROL</flux:heading>
         <flux:separator variant="subtle" class="mt-4" />
     </div>
 

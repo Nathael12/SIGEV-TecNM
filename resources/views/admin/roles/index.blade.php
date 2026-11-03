@@ -42,10 +42,16 @@
                                 <i class="fas fa-eye mr-2"></i>
                                 Ver
                             </a>
-                            <a href=""
+                            <a href="{{ url('/admin/rol/'. $rol->id.'/edit') }}"
                                 class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700">
                                 <i class="fas fa-pencil-alt mr-2"></i>
                                 Editar
+                            </a>
+
+                            <a href=""
+                                class="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700">
+                                <i class="fas fa-trash-alt mr-2"></i>
+                                Eliminar
                             </a>
                             </div>
 

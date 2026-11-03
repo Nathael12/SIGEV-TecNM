@@ -62,6 +62,8 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         //
+        $rol = Role::find($id);
+        return view('admin.roles.edit', compact('rol'));
     }
 
     /**
@@ -70,7 +72,20 @@ class RoleController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+        'name' => 'required|string|max:255|unique:roles,name,' . $id,
+        ]);
+        
+        $rol = Role::find($id);
+        $rol->name = $request->name;
+        $rol->save();
+
+        return redirect()->route('admin.roles.index')
+        ->with('mensaje','Rol actualizado correctamente')
+        -> with('icono','success');
+
     }
+
 
     /**
      * Remove the specified resource from storage.
