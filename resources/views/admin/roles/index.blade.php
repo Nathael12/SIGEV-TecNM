@@ -42,17 +42,44 @@
                                 <i class="fas fa-eye mr-2"></i>
                                 Ver
                             </a>
-                            <a href="{{ url('/admin/rol/'. $rol->id.'/edit') }}"
-                                class="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700">
-                                <i class="fas fa-pencil-alt mr-2"></i>
-                                Editar
+
+                            <a href="{{ url('/admin/rol/' . $rol->id . '/edit') }}"
+                                class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
+                                <i class="fas fa-pencil-alt mr-2"></i> Editar
                             </a>
 
-                            <a href=""
-                                class="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-emerald-700">
-                                <i class="fas fa-trash-alt mr-2"></i>
-                                Eliminar
-                            </a>
+                           <form action="{{ url('/admin/rol/' . $rol->id) }}" method="post" id="miFormulario{{ $rol->id }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                    class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded transition"
+                                    onclick="preguntar(event, '{{ $rol->id }}')">
+                                    <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                                </button>
+                            </form>
+                             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                            <script>
+                                function preguntar(event,id) {
+                                    event.preventDefault();
+
+                                    Swal.fire({
+                                        title: '¿Desea eliminar este registro?',
+                                        text: '',
+                                        icon: 'question',
+                                        showDenyButton: true,
+                                        confirmButtonText: 'Eliminar',
+                                        confirmButtonColor: '#a5161d',
+                                        denyButtonColor: '#270a0a',
+                                        denyButtonText: 'Cancelar',
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Sin espacio para que coincida exactamente con el id del form
+                                            document.getElementById('miFormulario{{ $rol->id }}').submit();
+                                        }
+                                    });
+                                }
+                            </script>
                             </div>
 
 
