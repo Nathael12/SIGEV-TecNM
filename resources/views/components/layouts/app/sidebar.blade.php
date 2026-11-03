@@ -18,8 +18,8 @@
                         {{ __('Inicio') }}
                     </flux:navlist.item>
 
-                    <flux:navlist.item icon="users" :href="route('usuarios.index')"
-                        :current="request()->routeIs('usuarios*')" wire:navigate>
+                    <flux:navlist.item icon="users" :href="route('admin.usuarios.index')"
+                        :current="request()->routeIs('admin.usuarios.*')" wire:navigate>
                         {{ __('Usuarios') }}
                     </flux:navlist.item>
 
