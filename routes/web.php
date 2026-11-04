@@ -15,7 +15,7 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     // Mis rutas de admin   
-    Route::view('usuarios', 'admin.usuarios.index')->name('usuarios.index');
+    Route::redirect('usuarios', '/admin/usuarios')->name('usuarios.index');
 
 
     //rutas para los roles
