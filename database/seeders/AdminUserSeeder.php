@@ -17,12 +17,18 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@ejemplo.com'], // Condición para buscar si ya existe
             [
-                'name' => 'Administrador',
-                'password' => Hash::make('admin12'), // Encriptación obligatoria
-                // Si usas un sistema de roles simple por columna (ej. enum o string):
-                // 'role' => 'admin', 
-                'email_verified_at' => now(),
-            ]
-        );
+            'name' => 'admin',
+            //'email' => 'admin@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('admin123'), //Encriptación obligatoria
+            'nombre_usuario' => 'Administrador',
+            'apellido_paterno' => 'Uc',
+            'apellido_materno' => 'Coh',
+            'correo_usuario' => 'angel@gmail.com',
+            'telefono_usuario' => '9961085232',
+            'estado' => 'Activo',
+            // Si usas un sistema de roles simple por columna (ej. enum o string):
+            // 'role' => 'admin', 
+        ])->assignRole('Administrador');
     }
 }

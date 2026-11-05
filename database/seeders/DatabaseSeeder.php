@@ -18,17 +18,15 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         Role::create(['name' => 'Administrador']);
         Role::create(['name' => 'Encargado Flotilla']);
-
-        /*User::factory()->create([
+            
+        /*Por defecto
+        User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);*/
-        /*
-        // Llamamos al seeder del administrador
-        $this->call([
-            AdminUserSeeder::class,
-        */
-
+        /* 
+        
+        /* Creado por angel
         User::factory()->create([
             'name' => 'Administrador',
             'email' => 'administrador@gmail.com',
@@ -40,6 +38,12 @@ class DatabaseSeeder extends Seeder
             'telefono_usuario' => '9961085232',
             'estado' => 'Activo',
         ])->assignRole('Administrador');
+        */
+        
+        // Llamamos al seeder del administrador
+        $this->call([
+            AdminUserSeeder::class,
+        ]);
 
         Ajuste::create([
             'nombre' => 'Mi Empresa',   
