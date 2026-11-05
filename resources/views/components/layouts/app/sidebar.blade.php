@@ -47,11 +47,7 @@
                         :current="request()->routeIs('admin.ajustes.index')" wire:navigate>
                         {{ __('Ajustes') }}
                     </flux:navlist.item>
-
-                    <flux:navlist.item icon="users" :href="route('admin.usuarios.index')" 
-                        :current="request()->routeIs('admin.usuarios.index')" wire:navigate>Usuarios
-                    </flux:navlist.item>
-
+                    
                 </flux:navlist.group>
             </flux:navlist>
 
