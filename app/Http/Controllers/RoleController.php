@@ -61,8 +61,14 @@ class RoleController extends Controller
      */
     public function edit(string $id)
     {
-        //
-        $rol = Role::find($id);
+        $rol = Role::findOrFail($id);
+
+        if ($rol->name === 'Administrador') {
+            return redirect()->route('admin.roles.index')
+                ->with('mensaje', 'El rol Administrador del sistema no se puede editar.')
+                ->with('icono', 'error');
+        }
+
         return view('admin.roles.edit', compact('rol'));
     }
 
@@ -71,12 +77,18 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $rol = Role::findOrFail($id);
+
+        if ($rol->name === 'Administrador') {
+            return redirect()->route('admin.roles.index')
+                ->with('mensaje', 'El rol Administrador del sistema no se puede editar.')
+                ->with('icono', 'error');
+        }
+
         $request->validate([
         'name' => 'required|string|max:255|unique:roles,name,' . $id,
         ]);
 
-        $rol = Role::find($id);
         $rol->name = $request->name;
         $rol->save();
 
@@ -91,13 +103,20 @@ class RoleController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-{
-    //echo "Eliminando el rol con ID: " . $id;
-    $rol = Role::find($id);
-    $rol->delete();
+    {
+        $rol = Role::findOrFail($id);
 
-    return redirect()->route('admin.roles.index')
-        ->with('mensaje', 'Rol eliminado correctamente')
-        ->with('icono', 'success');
-}
+        // El rol Administrador es necesario para conservar el acceso administrativo.
+        if ($rol->name === 'Administrador') {
+            return redirect()->route('admin.roles.index')
+                ->with('mensaje', 'El rol Administrador del sistema no se puede eliminar.')
+                ->with('icono', 'error');
+        }
+
+        $rol->delete();
+
+        return redirect()->route('admin.roles.index')
+            ->with('mensaje', 'Rol eliminado correctamente')
+            ->with('icono', 'success');
+    }
 }
