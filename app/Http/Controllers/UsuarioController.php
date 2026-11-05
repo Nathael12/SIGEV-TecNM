@@ -97,7 +97,7 @@ class UsuarioController extends Controller
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'required|string|max:255',
             'telefono_usuario' => 'required|digits:10',
-            'estado'           => 'required|in:Activo,Inactivo',
+
         ]);
  
         $usuario = User::findOrFail($id);
@@ -113,7 +113,6 @@ class UsuarioController extends Controller
         $usuario->apellido_materno = $request->apellido_materno;
         $usuario->correo_usuario   = $request->correo_usuario;
         $usuario->telefono_usuario = $request->telefono_usuario;
-        $usuario->estado           = $request->estado;
         $usuario->save();
  
         $usuario->syncRoles($request->rol);
