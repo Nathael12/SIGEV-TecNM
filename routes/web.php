@@ -16,6 +16,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Mis rutas de admin   
     Route::view('usuarios', 'admin.usuarios.index')->name('usuarios.index');
+    
 
 
     //rutas para los roles
@@ -40,6 +41,9 @@ Route::post('/admin/ajustes', [App\Http\Controllers\AjusteController::class, 'st
 Route::get('/admin/roles', [App\Http\Controllers\RoleController::class, 'index'])->name('admin.roles.index')->middleware('auth');
 Route::get('/admin/roles/create', [App\Http\Controllers\RoleController::class, 'create'])->name('admin.roles.create')->middleware('auth');
 Route::post('/admin/roles/create', [App\Http\Controllers\RoleController::class, 'store'])->name('admin.roles.create')->middleware('auth');
+
+
+
 
 
 //rutas para usuarios
