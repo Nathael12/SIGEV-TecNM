@@ -112,18 +112,15 @@
                         <flux:error name="rol" />
                     </div>
 
-                    {{-- Estado --}}
+                    {{-- Estado (solo lectura: se cambia con Eliminar / Restaurar) --}}
                     <div>
-                        <flux:label>Estado <span class="text-red-500" title="Campo obligatorio">(*)</span>
-                        </flux:label>
-                        <flux:select placeholder="Selecciona un estado..." name="estado" required>
+                        <flux:label>Estado No Editable</flux:label>
+                        <flux:select name="estado" disabled>
                             <flux:select.option value="Activo"
-                                :selected="old('estado', $usuario->estado) == 'Activo'">Activo</flux:select.option>
+                                :selected="$usuario->estado == 'Activo'">Activo</flux:select.option>
                             <flux:select.option value="Inactivo"
-                                :selected="old('estado', $usuario->estado) == 'Inactivo'">Inactivo
-                            </flux:select.option>
+                                :selected="$usuario->estado == 'Inactivo'">Inactivo</flux:select.option>
                         </flux:select>
-                        <flux:error name="estado" />
                     </div>
 
                     {{-- Fila 3: contraseña opcional --}}
