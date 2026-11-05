@@ -50,7 +50,10 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+       // echo "Mostrando el rol con id:" . $id;
+       $rol = Role::find($id);
+       //return response()->json($rol);
+       return view('admin.roles.show', compact('rol'));
     }
 
     /**
@@ -59,6 +62,8 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         //
+        $rol = Role::find($id);
+        return view('admin.roles.edit', compact('rol'));
     }
 
     /**
@@ -67,13 +72,32 @@ class RoleController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $request->validate([
+        'name' => 'required|string|max:255|unique:roles,name,' . $id,
+        ]);
+
+        $rol = Role::find($id);
+        $rol->name = $request->name;
+        $rol->save();
+
+        return redirect()->route('admin.roles.index')
+        ->with('mensaje','Rol actualizado correctamente')
+        -> with('icono','success');
+
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        //
-    }
+{
+    //echo "Eliminando el rol con ID: " . $id;
+    $rol = Role::find($id);
+    $rol->delete();
+
+    return redirect()->route('admin.roles.index')
+        ->with('mensaje', 'Rol eliminado correctamente')
+        ->with('icono', 'success');
+}
 }
