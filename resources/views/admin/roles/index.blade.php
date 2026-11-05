@@ -43,11 +43,14 @@
                                 Ver
                             </a>
 
-                            <a href="{{ url('/admin/rol/' . $rol->id . '/edit') }}"
-                                class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
-                                <i class="fas fa-pencil-alt mr-2"></i> Editar
-                            </a>
+                            @if ($rol->name !== 'Administrador')
+                                <a href="{{ url('/admin/rol/' . $rol->id . '/edit') }}"
+                                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded transition">
+                                    <i class="fas fa-pencil-alt mr-2"></i> Editar
+                                </a>
+                            @endif
 
+                           @if ($rol->name !== 'Administrador')
                            <form action="{{ url('/admin/rol/' . $rol->id) }}" method="post" id="miFormulario{{ $rol->id }}">
                                 @csrf
                                 @method('DELETE')
@@ -80,6 +83,11 @@
                                     });
                                 }
                             </script>
+                            @else
+                            <span class="inline-flex items-center rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400" title="Rol protegido del sistema">
+                                <i class="fas fa-lock mr-2"></i> Protegido
+                            </span>
+                            @endif
                             </div>
 
 
