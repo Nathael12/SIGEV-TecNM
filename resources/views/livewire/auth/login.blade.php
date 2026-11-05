@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -31,6 +33,19 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $campo = filter_var($this->email, FILTER_VALIDATE_EMAIL)
             ? 'email'
             : 'nombre_usuario';
+
+        // Usuario eliminado (SoftDeletes): solo se avisa si la contraseña es correcta,
+        // así no se revela a terceros que la cuenta existe.
+        $usuarioEliminado = User::onlyTrashed()
+            ->where($campo, $this->email)
+            ->get()
+            ->first(fn ($u) => Hash::check($this->password, $u->password));
+
+        if ($usuarioEliminado) {
+            throw ValidationException::withMessages([
+                'email' => 'Tu cuenta ha sido desactivada. Contacta al administrador.',
+            ]);
+        }
 
         if (! Auth::attempt([
             $campo => $this->email,
