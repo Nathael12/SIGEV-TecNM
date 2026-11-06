@@ -23,8 +23,8 @@
                         {{ __('Usuarios') }}
                     </flux:navlist.item>
 
-                    <flux:navlist.item icon="truck" href="#"
-                        :current="false">
+                    <flux:navlist.item icon="truck" :href="route('admin.vehiculos.index')"
+                        :current="request()->routeIs('admin.vehiculos.*')" wire:navigate>
                         {{ __('Vehículos') }}
                     </flux:navlist.item>
 
