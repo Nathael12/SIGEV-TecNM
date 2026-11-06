@@ -20,6 +20,9 @@
             <div><flux:label>Fecha de adquisición</flux:label><flux:input icon="calendar-days" value="{{ $vehiculo->fecha_adquisicion->format('d/m/Y') }}" readonly /></div>
             <div><flux:label>Estado</flux:label><flux:input :icon="$vehiculo->estado === 'Activo' ? 'check-circle' : 'no-symbol'" value="{{ $vehiculo->estado }}" readonly /></div>
         </div>
-        <div class="flex justify-end px-6 pb-6"><a href="{{ route('admin.vehiculos.index') }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Volver al listado</a></div>
+        <div class="flex justify-end gap-2 px-6 pb-6">
+            <a href="{{ route('admin.vehiculos.index') }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600"><i class="fas fa-arrow-left mr-2"></i> Volver al listado</a>
+            <a href="{{ route('admin.vehiculos.edit', $vehiculo->getKey()) }}" class="inline-flex items-center rounded bg-amber-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-600"><i class="fas fa-pen mr-2"></i> Editar vehículo</a>
+        </div>
     </div>
 </x-layouts.app>
