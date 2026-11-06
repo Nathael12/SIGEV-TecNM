@@ -47,6 +47,13 @@ class RoleSeeder extends Seeder
             'actualizar usuario',
             'eliminar usuario',
             'restaurar usuario',
+
+            //Vehiculo
+            'ver vehiculos',
+            'ver formulario crear vehiculo',
+            'guardar vehiculo',
+            'ver detalle vehiculo'
+
         ];
 
         foreach ($permisos as $permiso) {
@@ -60,6 +67,11 @@ class RoleSeeder extends Seeder
         // Encargado Flotilla: dashboard 
         $encargado->syncPermissions([
             'ver dashboard',
+            'ver vehiculos',
+            'ver formulario crear vehiculo',
+            'guardar vehiculo',
+            'ver detalle vehiculo'
+
             
         ]);
     }
