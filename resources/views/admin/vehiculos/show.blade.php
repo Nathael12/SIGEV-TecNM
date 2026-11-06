@@ -7,6 +7,16 @@
         @if (session('mensaje'))
             <div class="m-6 mb-0 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
         @endif
+        <div class="p-6 pb-0">
+            @if ($fotografiaUrl)
+                <img src="{{ $fotografiaUrl }}" alt="Fotografía de {{ $vehiculo->marca }} {{ $vehiculo->modelo }}" class="max-h-96 w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain dark:border-zinc-700 dark:bg-zinc-900">
+            @else
+                <div class="flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 text-slate-400 dark:border-zinc-700 dark:bg-zinc-900">
+                    <flux:icon name="truck" class="size-12" />
+                    <span class="text-sm">Fotografía no disponible</span>
+                </div>
+            @endif
+        </div>
         <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
             <div><flux:label>Número económico</flux:label><flux:input icon="hashtag" value="{{ $vehiculo->numero_economico }}" readonly /></div>
             <div><flux:label>Placas</flux:label><flux:input icon="identification" value="{{ $vehiculo->placas }}" readonly /></div>

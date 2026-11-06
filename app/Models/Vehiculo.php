@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Vehiculo extends Model
 {
@@ -22,6 +23,7 @@ class Vehiculo extends Model
         'kilometraje',
         'fecha_adquisicion',
         'estado',
+        'fotografia',
     ];
 
     protected $casts = [
@@ -29,4 +31,13 @@ class Vehiculo extends Model
         'kilometraje' => 'decimal:2',
         'fecha_adquisicion' => 'date',
     ];
+
+    public function getFotografiaUrlAttribute(): ?string
+    {
+        if (! $this->fotografia || ! Storage::disk('public')->exists($this->fotografia)) {
+            return null;
+        }
+
+        return asset('storage/' . ltrim($this->fotografia, '/'));
+    }
 }

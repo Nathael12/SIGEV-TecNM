@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Vehiculo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class VehiculoController extends Controller
 {
+    private const ESTADOS = [
+        'Disponible',
+        'Asignado',
+        'En mantenimiento',
+        'Fuera de servicio',
+        'Baja',
+    ];
+
     public function index()
     {
         $vehiculos = Vehiculo::orderBy('numero_economico')->get();
@@ -16,7 +25,8 @@ class VehiculoController extends Controller
 
     public function create()
     {
-        return view('admin.vehiculos.create');
+        $estados = self::ESTADOS;
+        return view('admin.vehiculos.create', compact('estados'));
     }
 
     public function store(Request $request)
@@ -39,12 +49,19 @@ class VehiculoController extends Controller
             'combustible' => ['required', 'string', 'max:255'],
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
-            'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],
+            'estado' => ['required', Rule::in(self::ESTADOS)],
+            'fotografia' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
             'numero_economico.unique' => 'Este número económico ya está registrado.',
             'placas.unique' => 'Estas placas ya están registradas.',
         ]);
 
+        $rutaFotografia = $request->file('fotografia')->store('vehiculos', 'public');
+        if (! $rutaFotografia) {
+            return back()->withInput()->withErrors(['fotografia' => 'No se pudo guardar la fotografía. Inténtalo de nuevo.']);
+        }
+
+        $datos['fotografia'] = $rutaFotografia;
         $vehiculo = Vehiculo::create($datos);
         return redirect()->route('admin.vehiculos.index')
             ->with('mensaje', 'Vehículo registrado correctamente');
@@ -53,13 +70,17 @@ class VehiculoController extends Controller
     public function show(string $id)
     {
         $vehiculo = Vehiculo::findOrFail($id);
-        return view('admin.vehiculos.show', compact('vehiculo'));
+        $fotografiaUrl = $vehiculo->fotografia_url;
+
+        return view('admin.vehiculos.show', compact('vehiculo', 'fotografiaUrl'));
     }
 
     public function edit(string $id)
     {
         $vehiculo = Vehiculo::findOrFail($id);
-        return view('admin.vehiculos.edit', compact('vehiculo'));
+        $fotografiaUrl = $vehiculo->fotografia_url;
+        $estados = self::ESTADOS;
+        return view('admin.vehiculos.edit', compact('vehiculo', 'estados', 'fotografiaUrl'));
     }
 
     public function update(Request $request, string $id)
@@ -82,13 +103,29 @@ class VehiculoController extends Controller
             'combustible' => ['required', 'string', 'max:255'],
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
-            'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],
+            'estado' => ['required', Rule::in(self::ESTADOS)],
+            'fotografia' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
             'numero_economico.unique' => 'Este número económico ya está registrado por otro vehículo.',
             'placas.unique' => 'Estas placas ya están registradas por otro vehículo.',
         ]);
 
+        unset($datos['fotografia']);
+        $fotografiaAnterior = $vehiculo->fotografia;
+        if ($request->hasFile('fotografia')) {
+            $rutaFotografia = $request->file('fotografia')->store('vehiculos', 'public');
+            if (! $rutaFotografia) {
+                return back()->withInput()->withErrors(['fotografia' => 'No se pudo guardar la fotografía. Inténtalo de nuevo.']);
+            }
+
+            $datos['fotografia'] = $rutaFotografia;
+        }
+
         $vehiculo->update($datos);
+
+        if ($request->hasFile('fotografia') && $fotografiaAnterior) {
+            Storage::disk('public')->delete($fotografiaAnterior);
+        }
 
         return redirect()->route('admin.vehiculos.index')
             ->with('mensaje', 'Vehículo actualizado correctamente');
@@ -97,7 +134,11 @@ class VehiculoController extends Controller
     public function destroy(string $id)
     {
         $vehiculo = Vehiculo::findOrFail($id);
+        $fotografia = $vehiculo->fotografia;
         $vehiculo->delete();
+        if ($fotografia) {
+            Storage::disk('public')->delete($fotografia);
+        }
 
         return redirect()->route('admin.vehiculos.index')
             ->with('mensaje', 'Vehículo eliminado correctamente');
