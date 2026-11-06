@@ -32,6 +32,11 @@
                             <div class="flex justify-center gap-2">
                                 <a href="{{ route('admin.vehiculos.show', $vehiculo->getKey()) }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600"><i class="fas fa-eye mr-2"></i> Ver ficha</a>
                                 <a href="{{ route('admin.vehiculos.edit', $vehiculo->getKey()) }}" class="inline-flex items-center rounded bg-amber-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-600"><i class="fas fa-pen mr-2"></i> Editar</a>
+                                <form action="{{ route('admin.vehiculos.destroy', $vehiculo->getKey()) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este vehículo? Esta acción no se puede deshacer.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="inline-flex items-center rounded bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700"><i class="fas fa-trash mr-2"></i> Eliminar</button>
+                                </form>
                             </div>
                         </td>
                     </tr>
