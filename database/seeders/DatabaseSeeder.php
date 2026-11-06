@@ -16,16 +16,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
-        Role::create(['name' => 'Administrador']);
-        Role::create(['name' => 'Encargado Flotilla']);
-            
-        /*Por defecto
+
+        // Los roles ahora se crean en RoleSeeder (con sus permisos)
+        // Role::create(['name' => 'Administrador']);
+        // Role::create(['name' => 'Encargado Flotilla']);
+
+        /* Por defecto
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-        ]);*/
-        /* 
-        
+        ]);
+        */
+
         /* Creado por angel
         User::factory()->create([
             'name' => 'Administrador',
@@ -39,23 +41,24 @@ class DatabaseSeeder extends Seeder
             'estado' => 'Activo',
         ])->assignRole('Administrador');
         */
-        
-        // Llamamos al seeder del administrador
-        $this->call([
+
+        // El orden importa
+       $this->call([
+            RoleSeeder::class,
             AdminUserSeeder::class,
         ]);
 
         Ajuste::create([
-            'nombre' => 'Mi Empresa',   
+            'nombre'      => 'Mi Empresa',
             'descripcion' => 'Descripcion de la empresa',
-            'direccion' => 'Av. Principal',
-            'telefono' => '9999999999',
-            'email' => 'info@miempresa@.com',
-            'divisa' => 'Bs',
-            'logo' => null,
-            'web' => 'https://www.miempresa.com',
-            'interes' => 10.00,
-            'mora' => 2.00,            
+            'direccion'   => 'Av. Principal',
+            'telefono'    => '9999999999',
+            'email'       => 'info@miempresa.com',
+            'divisa'      => 'Bs',
+            'logo'        => null,
+            'web'         => 'https://www.miempresa.com',
+            'interes'     => 10.00,
+            'mora'        => 2.00,
         ]);
     }
 }
