@@ -26,11 +26,13 @@
                             {{ __('Usuarios') }}
                         </flux:navlist.item>
                     @endcan
-
+                    
+                    @can('ver vehiculos')
                     <flux:navlist.item icon="truck" :href="route('admin.vehiculos.index')"
                         :current="request()->routeIs('admin.vehiculos.*')" wire:navigate>
                         {{ __('Vehículos') }}
                     </flux:navlist.item>
+                     @endcan
 
                     <flux:navlist.item icon="wrench" href="#"
                         :current="false">
