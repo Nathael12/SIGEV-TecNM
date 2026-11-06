@@ -21,9 +21,16 @@ class VehiculoController extends Controller
 
     public function store(Request $request)
     {
+        // Estandariza los identificadores para que diferencias de espacios o
+        // mayúsculas no permitan registrar el mismo vehículo dos veces.
+        $request->merge([
+            'numero_economico' => trim((string) $request->input('numero_economico')),
+            'placas' => strtoupper(trim((string) $request->input('placas'))),
+        ]);
+
         $datos = $request->validate([
-            'numero_economico' => ['required', 'string', 'max:255', 'unique:vehiculos,numero_economico'],
-            'placas' => ['required', 'string', 'max:255', 'unique:vehiculos,placas'],
+            'numero_economico' => ['required', 'string', 'max:255', Rule::unique('vehiculos', 'numero_economico')],
+            'placas' => ['required', 'string', 'max:255', Rule::unique('vehiculos', 'placas')],
             'marca' => ['required', 'string', 'max:255'],
             'modelo' => ['required', 'string', 'max:255'],
             'anio' => ['required', 'integer', 'between:1901,' . (now()->year + 1)],
@@ -33,6 +40,9 @@ class VehiculoController extends Controller
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
             'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],
+        ], [
+            'numero_economico.unique' => 'Este número económico ya está registrado.',
+            'placas.unique' => 'Estas placas ya están registradas.',
         ]);
 
         $vehiculo = Vehiculo::create($datos);
@@ -56,6 +66,11 @@ class VehiculoController extends Controller
     {
         $vehiculo = Vehiculo::findOrFail($id);
 
+        $request->merge([
+            'numero_economico' => trim((string) $request->input('numero_economico')),
+            'placas' => strtoupper(trim((string) $request->input('placas'))),
+        ]);
+
         $datos = $request->validate([
             'numero_economico' => ['required', 'string', 'max:255', Rule::unique('vehiculos', 'numero_economico')->ignore($vehiculo->getKey(), 'id_vehiculo')],
             'placas' => ['required', 'string', 'max:255', Rule::unique('vehiculos', 'placas')->ignore($vehiculo->getKey(), 'id_vehiculo')],
@@ -68,6 +83,9 @@ class VehiculoController extends Controller
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
             'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],
+        ], [
+            'numero_economico.unique' => 'Este número económico ya está registrado por otro vehículo.',
+            'placas.unique' => 'Estas placas ya están registradas por otro vehículo.',
         ]);
 
         $vehiculo->update($datos);
