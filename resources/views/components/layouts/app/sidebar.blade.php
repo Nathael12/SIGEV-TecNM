@@ -13,20 +13,26 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.group heading="Platform" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')"
-                        :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Inicio') }}
-                    </flux:navlist.item>
+                    @can('ver dashboard')
+                        <flux:navlist.item icon="home" :href="route('dashboard')"
+                            :current="request()->routeIs('dashboard')" wire:navigate>
+                            {{ __('Inicio') }}
+                        </flux:navlist.item>
+                    @endcan
 
-                    <flux:navlist.item icon="users" :href="route('admin.usuarios.index')"
-                        :current="request()->routeIs('admin.usuarios.*')" wire:navigate>
-                        {{ __('Usuarios') }}
-                    </flux:navlist.item>
-
-                    <flux:navlist.item icon="truck" href="#"
-                        :current="false">
+                    @can('ver usuarios')
+                        <flux:navlist.item icon="users" :href="route('admin.usuarios.index')"
+                            :current="request()->routeIs('admin.usuarios.*')" wire:navigate>
+                            {{ __('Usuarios') }}
+                        </flux:navlist.item>
+                    @endcan
+                    
+                    @can('ver vehiculos')
+                    <flux:navlist.item icon="truck" :href="route('admin.vehiculos.index')"
+                        :current="request()->routeIs('admin.vehiculos.*')" wire:navigate>
                         {{ __('Vehículos') }}
                     </flux:navlist.item>
+                     @endcan
 
                     <flux:navlist.item icon="wrench" href="#"
                         :current="false">
@@ -38,16 +44,20 @@
                         {{ __('Reportes') }}
                     </flux:navlist.item>
 
-                    <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
-                        :current="request()->routeIs('admin.roles.index')" wire:navigate>
-                        Roles
-                    </flux:navlist.item>
+                    @can('ver roles')
+                        <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
+                            :current="request()->routeIs('admin.roles.*')" wire:navigate>
+                            {{ __('Roles') }}
+                        </flux:navlist.item>
+                    @endcan
 
-                    <flux:navlist.item icon="cog-6-tooth" :href="route('admin.ajustes.index')"
-                        :current="request()->routeIs('admin.ajustes.index')" wire:navigate>
-                        {{ __('Ajustes') }}
-                    </flux:navlist.item>
-                    
+                    @can('ver ajustes')
+                        <flux:navlist.item icon="cog-6-tooth" :href="route('admin.ajustes.index')"
+                            :current="request()->routeIs('admin.ajustes.*')" wire:navigate>
+                            {{ __('Ajustes') }}
+                        </flux:navlist.item>
+                    @endcan
+
                 </flux:navlist.group>
             </flux:navlist>
 

@@ -32,7 +32,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $campo = filter_var($this->email, FILTER_VALIDATE_EMAIL)
             ? 'email'
-            : 'nombre_usuario';
+            : 'name';
 
         // Usuario eliminado (SoftDeletes): solo se avisa si la contraseña es correcta,
         // así no se revela a terceros que la cuenta existe.
@@ -95,20 +95,20 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header title="Iniciar sesión" description="Ingresa tu correo electrónico o nombre de usuario y contraseña." />
+    <x-auth-header title="Iniciar sesión" description="Ingresa tu correo electrónico o nombre y contraseña." />
 
     <x-auth-session-status class="text-center" :status="session('status')" />
 
     <form wire:submit="login" class="flex flex-col gap-6">
         <flux:input
             wire:model="email"
-            label="Correo electrónico o nombre de usuario"
+            label="Correo electrónico o nombre"
             type="text"
             name="email"
             required
             autofocus
             autocomplete="username"
-            placeholder="Correo o nombre de usuario"
+            placeholder="Correo o nombre"
         />
 
         <div class="relative">
