@@ -77,3 +77,4 @@ Route::get('/admin/documento/{id}/edit', [App\Http\Controllers\DocumentoControll
 Route::put('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'update'])->name('admin.documentos.update')->middleware(['auth', 'can:actualizar documento']);
 Route::delete('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'destroy'])->name('admin.documentos.destroy')->middleware(['auth', 'can:eliminar documento']);
 Route::get('/admin/documento/{id}/descargar', [App\Http\Controllers\DocumentoController::class, 'descargar'])->name('admin.documentos.descargar')->middleware(['auth', 'can:descargar documento']);
+Route::get('/admin/documento/{id}/archivo', [App\Http\Controllers\DocumentoController::class, 'archivo'])->name('admin.documentos.archivo')->middleware(['auth', 'can:ver detalle documento']);

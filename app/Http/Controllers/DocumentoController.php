@@ -200,6 +200,22 @@ class DocumentoController extends Controller
     }
 
     /**
+     * Muestra el archivo en el navegador sin descargarlo (consulta, RF-12).
+     */
+    public function archivo(string $id)
+    {
+        $documento = Documento::findOrFail($id);
+
+        abort_unless(
+            $documento->ruta_archivo && Storage::exists($documento->ruta_archivo),
+            404,
+            'El archivo no existe.'
+        );
+
+        return Storage::response($documento->ruta_archivo, $documento->nombre_original);
+    }
+
+    /**
      * Descarga el archivo adjunto (RF-12). La ruta exige sesión iniciada.
      */
     public function descargar(string $id)
