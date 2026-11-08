@@ -47,6 +47,8 @@
                 @endforeach
             </section>
 
+            <x-alertas-documentos />
+
             <section aria-label="Flotilla de vehículos" class="space-y-5">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
