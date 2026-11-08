@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Documento extends Model
@@ -15,7 +16,7 @@ class Documento extends Model
     protected $fillable = [
         'descripcion_documento',
         'vigencia_inicio',
-        'vigencia_fin', 
+        'vigencia_fin',
         'importe',
         'ruta_archivo',
         'nombre_original',
@@ -50,5 +51,13 @@ class Documento extends Model
         }
 
         return 'Vigente';
+    }
+
+    /**
+     * Un documento pertenece a un vehículo (documentos.vehiculo_id -> vehiculos.id_vehiculo).
+     */
+    public function vehiculo(): BelongsTo
+    {
+        return $this->belongsTo(Vehiculo::class, 'vehiculo_id', 'id_vehiculo');
     }
 }

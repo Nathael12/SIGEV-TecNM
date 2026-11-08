@@ -68,4 +68,12 @@ Route::put('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::cl
 Route::delete('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'destroy'])->name('admin.vehiculos.destroy')->middleware('auth');
 
 
-
+//rutas para documentos
+Route::get('/admin/documentos', [App\Http\Controllers\DocumentoController::class, 'index'])->name('admin.documentos.index')->middleware(['auth', 'can:ver documentos']);
+Route::get('/admin/documentos/create', [App\Http\Controllers\DocumentoController::class, 'create'])->name('admin.documentos.create')->middleware(['auth', 'can:ver formulario crear documento']);
+Route::post('/admin/documentos/create', [App\Http\Controllers\DocumentoController::class, 'store'])->name('admin.documentos.store')->middleware(['auth', 'can:guardar documento']);
+Route::get('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'show'])->name('admin.documentos.show')->middleware(['auth', 'can:ver detalle documento']);
+Route::get('/admin/documento/{id}/edit', [App\Http\Controllers\DocumentoController::class, 'edit'])->name('admin.documentos.edit')->middleware(['auth', 'can:ver formulario editar documento']);
+Route::put('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'update'])->name('admin.documentos.update')->middleware(['auth', 'can:actualizar documento']);
+Route::delete('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'destroy'])->name('admin.documentos.destroy')->middleware(['auth', 'can:eliminar documento']);
+Route::get('/admin/documento/{id}/descargar', [App\Http\Controllers\DocumentoController::class, 'descargar'])->name('admin.documentos.descargar')->middleware(['auth', 'can:descargar documento']);

@@ -16,7 +16,7 @@ class RoleSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-       // ---------- Roles ----------
+        // ---------- Roles ----------
         $admin     = Role::firstOrCreate(['name' => 'Administrador',      'guard_name' => 'web']);
         $encargado = Role::firstOrCreate(['name' => 'Encargado Flotilla', 'guard_name' => 'web']);
 
@@ -48,12 +48,21 @@ class RoleSeeder extends Seeder
             'eliminar usuario',
             'restaurar usuario',
 
-            //Vehiculo
+            // Vehiculo
             'ver vehiculos',
             'ver formulario crear vehiculo',
             'guardar vehiculo',
-            'ver detalle vehiculo'
+            'ver detalle vehiculo',
 
+            // Documentos
+            'ver documentos',
+            'ver formulario crear documento',
+            'guardar documento',
+            'ver detalle documento',
+            'ver formulario editar documento',
+            'actualizar documento',
+            'eliminar documento',
+            'descargar documento',
         ];
 
         foreach ($permisos as $permiso) {
@@ -64,15 +73,21 @@ class RoleSeeder extends Seeder
         // Administrador: todos los permisos
         $admin->syncPermissions(Permission::all());
 
-        // Encargado Flotilla: dashboard 
+        // Encargado Flotilla: dashboard, vehículos y documentos
+        // (puede consultar, registrar y descargar documentos; no editarlos ni eliminarlos)
         $encargado->syncPermissions([
             'ver dashboard',
+
             'ver vehiculos',
             'ver formulario crear vehiculo',
             'guardar vehiculo',
-            'ver detalle vehiculo'
+            'ver detalle vehiculo',
 
-            
+            'ver documentos',
+            'ver formulario crear documento',
+            'guardar documento',
+            'ver detalle documento',
+            'descargar documento',
         ]);
     }
 }

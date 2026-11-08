@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Documento;
+use App\Models\Vehiculo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,53 +16,82 @@ class DocumentoController extends Controller
     private function reglas(bool $archivoObligatorio): array
     {
         return [
-            'vehiculo_id'           => 'required|integer|min:1',
             'descripcion_documento' => 'required|string|max:255',
             'vigencia_inicio'       => 'required|date',
             'vigencia_fin'          => 'required|date|after_or_equal:vigencia_inicio',
             'importe'               => 'required|numeric|min:0|max:99999999.99',
             // RF-13: solo PDF o imágenes, máximo 5 MB (5120 KB)
             'archivo'               => ($archivoObligatorio ? 'required' : 'nullable')
-             . '|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                . '|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ];
     }
 
     private function mensajes(): array
     {
         return [
-            'required'                   => 'Este campo es obligatorio.',
-            'integer'                    => 'Escribe un número entero.',
-            'numeric'                    => 'Escribe un número válido.',
-            'date'                       => 'Escribe una fecha válida.',
-            'min'                        => 'El valor mínimo es :min.',
-            'max'                        => 'El valor máximo es :max.',
+            'required'                    => 'Este campo es obligatorio.',
+            'integer'                     => 'Escribe un número entero.',
+            'numeric'                     => 'Escribe un número válido.',
+            'date'                        => 'Escribe una fecha válida.',
+            'min'                         => 'El valor mínimo es :min.',
+            'max'                         => 'El valor máximo es :max.',
+            'vehiculo_id.required'        => 'Selecciona un vehículo.',
+            'vehiculo_id.exists'          => 'El vehículo seleccionado no existe.',
             'vigencia_fin.after_or_equal' => 'La vigencia final no puede ser anterior a la inicial.',
-            'archivo.required'           => 'Debes adjuntar un archivo.',
-            'archivo.mimes'              => 'Solo se permiten archivos PDF, JPG o PNG.',
-            'archivo.max'                => 'El archivo no puede pesar más de 5 MB.',
-            'archivo.uploaded'           => 'No se pudo subir el archivo. Puede superar el tamaño permitido.',
+            'archivo.required'            => 'Debes adjuntar un archivo.',
+            'archivo.mimes'               => 'Solo se permiten archivos PDF, JPG o PNG.',
+            'archivo.max'                 => 'El archivo no puede pesar más de 5 MB.',
+            'archivo.uploaded'            => 'No se pudo subir el archivo. Puede superar el tamaño permitido.',
         ];
     }
 
     /**
-     * Listado de documentos (con alertas de vigencia, RF-14).
+     * Regresa al listado de documentos del vehículo indicado.
      */
-    public function index()
+    private function volverAlListado($vehiculoId, string $mensaje)
     {
-        $documentos = Documento::orderBy('vigencia_fin')->get();
+        return redirect()->route('admin.documentos.index', ['vehiculo' => $vehiculoId])
+            ->with('mensaje', $mensaje)
+            ->with('icono', 'success');
+    }
+
+    /**
+     * Listado de documentos. Con ?vehiculo=ID solo muestra los de ese vehículo.
+     * Incluye alertas de vigencia (RF-14).
+     */
+    public function index(Request $request)
+    {
+        $consulta = Documento::with('vehiculo')->orderBy('vigencia_fin');
+        $vehiculo = null;
+
+        if ($request->filled('vehiculo')) {
+            $vehiculo = Vehiculo::findOrFail($request->vehiculo);
+            $consulta->where('vehiculo_id', $vehiculo->getKey());
+        }
+
+        $documentos = $consulta->get();
 
         $vencidos  = $documentos->filter(fn ($d) => $d->estado_vigencia === 'Vencido')->count();
         $porVencer = $documentos->filter(fn ($d) => $d->estado_vigencia === 'Por vencer')->count();
 
-        return view('admin.documentos.index', compact('documentos', 'vencidos', 'porVencer'));
+        return view('admin.documentos.index', compact('documentos', 'vencidos', 'porVencer', 'vehiculo'));
     }
 
     /**
      * Formulario para registrar un documento.
+     * Un documento siempre se registra desde el vehículo al que pertenece
+     * (?vehiculo=ID), así no se puede mezclar la documentación entre vehículos.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.documentos.create');
+        if (! $request->filled('vehiculo')) {
+            return redirect()->route('admin.vehiculos.index')
+                ->with('mensaje', 'Para registrar un documento, entra a la Documentación del vehículo correspondiente.');
+        }
+
+        $vehiculo = Vehiculo::findOrFail($request->vehiculo);
+
+        return view('admin.documentos.create', compact('vehiculo'));
     }
 
     /**
@@ -69,7 +99,10 @@ class DocumentoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate($this->reglas(true), $this->mensajes());
+        $request->validate(
+            $this->reglas(true) + ['vehiculo_id' => 'required|integer|exists:vehiculos,id_vehiculo'],
+            $this->mensajes()
+        );
 
         $archivo = $request->file('archivo');
 
@@ -93,9 +126,7 @@ class DocumentoController extends Controller
             'tamano_archivo'        => $tamano,
         ]);
 
-        return redirect()->route('admin.documentos.index')
-            ->with('mensaje', 'Documento registrado correctamente')
-            ->with('icono', 'success');
+        return $this->volverAlListado($request->vehiculo_id, 'Documento registrado correctamente');
     }
 
     /**
@@ -103,7 +134,7 @@ class DocumentoController extends Controller
      */
     public function show(string $id)
     {
-        $documento = Documento::findOrFail($id);
+        $documento = Documento::with('vehiculo')->findOrFail($id);
         return view('admin.documentos.show', compact('documento'));
     }
 
@@ -112,7 +143,8 @@ class DocumentoController extends Controller
      */
     public function edit(string $id)
     {
-        $documento = Documento::findOrFail($id);
+        $documento = Documento::with('vehiculo')->findOrFail($id);
+
         return view('admin.documentos.edit', compact('documento'));
     }
 
@@ -125,7 +157,6 @@ class DocumentoController extends Controller
 
         $documento = Documento::findOrFail($id);
 
-        $documento->vehiculo_id           = $request->vehiculo_id;
         $documento->descripcion_documento = $request->descripcion_documento;
         $documento->vigencia_inicio       = $request->vigencia_inicio;
         $documento->vigencia_fin          = $request->vigencia_fin;
@@ -152,9 +183,7 @@ class DocumentoController extends Controller
 
         $documento->save();
 
-        return redirect()->route('admin.documentos.index')
-            ->with('mensaje', 'Documento actualizado correctamente')
-            ->with('icono', 'success');
+        return $this->volverAlListado($documento->vehiculo_id, 'Documento actualizado correctamente');
     }
 
     /**
@@ -163,11 +192,11 @@ class DocumentoController extends Controller
     public function destroy(string $id)
     {
         $documento = Documento::findOrFail($id);
+        $vehiculoId = $documento->vehiculo_id;
+
         $documento->delete();
 
-        return redirect()->route('admin.documentos.index')
-            ->with('mensaje', 'Documento eliminado correctamente')
-            ->with('icono', 'success');
+        return $this->volverAlListado($vehiculoId, 'Documento eliminado correctamente');
     }
 
     /**
