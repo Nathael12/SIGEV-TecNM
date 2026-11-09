@@ -34,10 +34,12 @@
                     </flux:navlist.item>
                      @endcan
 
-                    <flux:navlist.item icon="wrench" href="#"
-                        :current="false">
+                    @can('ver mantenimientos')
+                    <flux:navlist.item icon="wrench" :href="route('admin.mantenimientos.index')"
+                        :current="request()->routeIs('admin.mantenimientos.*')" wire:navigate>
                         {{ __('Mantenimiento') }}
                     </flux:navlist.item>
+                    @endcan
 
                     <flux:navlist.item icon="document-chart-bar" href="#"
                         :current="false">

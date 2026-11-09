@@ -67,6 +67,11 @@ Route::get('/admin/vehiculos/{id}/edit', [App\Http\Controllers\VehiculoControlle
 Route::put('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'update'])->name('admin.vehiculos.update')->middleware('auth');
 Route::delete('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'destroy'])->name('admin.vehiculos.destroy')->middleware('auth');
 
+//rutas para mantenimientos
+Route::get('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'index'])->name('admin.mantenimientos.index')->middleware(['auth', 'can:ver mantenimientos']);
+Route::get('/admin/mantenimientos/create', [App\Http\Controllers\MantenimientoController::class, 'create'])->name('admin.mantenimientos.create')->middleware(['auth', 'can:ver formulario crear mantenimiento']);
+Route::post('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'store'])->name('admin.mantenimientos.store')->middleware(['auth', 'can:guardar mantenimiento']);
+
 
 //rutas para documentos
 Route::get('/admin/documentos', [App\Http\Controllers\DocumentoController::class, 'index'])->name('admin.documentos.index')->middleware(['auth', 'can:ver documentos']);

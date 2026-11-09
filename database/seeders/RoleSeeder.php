@@ -54,6 +54,11 @@ class RoleSeeder extends Seeder
             'guardar vehiculo',
             'ver detalle vehiculo',
 
+            // Mantenimiento
+            'ver mantenimientos',
+            'ver formulario crear mantenimiento',
+            'guardar mantenimiento',
+
             // Documentos
             'ver documentos',
             'ver formulario crear documento',
@@ -82,6 +87,10 @@ class RoleSeeder extends Seeder
             'ver formulario crear vehiculo',
             'guardar vehiculo',
             'ver detalle vehiculo',
+
+            'ver mantenimientos',
+            'ver formulario crear mantenimiento',
+            'guardar mantenimiento',
 
             'ver documentos',
             'ver formulario crear documento',
