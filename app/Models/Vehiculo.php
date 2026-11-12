@@ -18,10 +18,10 @@ class Vehiculo extends Model
         'marca',
         'modelo',
         'anio',
-        'tipo',
+        'tipo vehiculo',
         'color',
-        'combustible',
-        'kilometraje',
+        'tipo combustible',
+        'kilometraje actual',
         'fecha_adquisicion',
         'estado',
         'fotografia',
@@ -29,7 +29,7 @@ class Vehiculo extends Model
 
     protected $casts = [
         'anio' => 'integer',
-        'kilometraje' => 'decimal:2',
+        'kilometraje actual' => 'decimal:2',
         'fecha_adquisicion' => 'date',
     ];
 
