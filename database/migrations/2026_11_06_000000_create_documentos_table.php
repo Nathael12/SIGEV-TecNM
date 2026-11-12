@@ -29,7 +29,8 @@ return new class extends Migration
             // Todavía SIN constraint porque la tabla vehiculos aún no existe.
             // Cuando exista, se agrega con una migración aparte:
             // $table->foreign('vehiculo_id')->references('id_vehiculo')->on('vehiculos');
-            $table->unsignedBigInteger('vehiculo_id')->index();
+            //$table->unsignedBigInteger('vehiculo_id')->index(); //Se retiro index() en la migración creat_documentos_table para eliminar el índice duplicado, evita crear un índice llamado documentos_vehiculo_id_index en relación a esta primera migración. La segunda migración crea la llave foránea documentos_vehiculo_id_foreign, y el motor de base de datos (como MySQL/InnoDB) genera automáticamente un segundo índice asociado a ella.
+            $table->unsignedBigInteger('vehiculo_id');
 
             $table->timestamps();
             $table->softDeletes();
