@@ -14,10 +14,23 @@
                 <div><flux:label>Marca <span class="text-red-500">(*)</span></flux:label><flux:input name="marca" value="{{ old('marca', $vehiculo->marca) }}" icon="truck" required /><flux:error name="marca" /></div>
                 <div><flux:label>Modelo <span class="text-red-500">(*)</span></flux:label><flux:input name="modelo" value="{{ old('modelo', $vehiculo->modelo) }}" icon="truck" required /><flux:error name="modelo" /></div>
                 <div><flux:label>Año <span class="text-red-500">(*)</span></flux:label><flux:input name="anio" type="number" min="1901" max="{{ now()->year + 1 }}" value="{{ old('anio', $vehiculo->anio) }}" required /><flux:error name="anio" /></div>
-                <div><flux:label>Tipo <span class="text-red-500">(*)</span></flux:label><flux:input name="tipo" value="{{ old('tipo', $vehiculo->tipo) }}" icon="squares-2x2" required /><flux:error name="tipo" /></div>
+                <div><flux:label>Tipo de vehículo <span class="text-red-500">(*)</span></flux:label><flux:input name="tipo" value="{{ old('tipo', $vehiculo->tipo) }}" icon="squares-2x2" required /><flux:error name="tipo" /></div>
                 <div><flux:label>Color <span class="text-red-500">(*)</span></flux:label><flux:input name="color" value="{{ old('color', $vehiculo->color) }}" icon="swatch" required /><flux:error name="color" /></div>
-                <div><flux:label>Combustible <span class="text-red-500">(*)</span></flux:label><flux:input name="combustible" value="{{ old('combustible', $vehiculo->combustible) }}" icon="bolt" required /><flux:error name="combustible" /></div>
-                <div><flux:label>Kilometraje <span class="text-red-500">(*)</span></flux:label><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje', $vehiculo->kilometraje) }}" required /><flux:error name="kilometraje" /></div>
+                <div>
+                    <flux:label>Tipo de combustible <span class="text-red-500">(*)</span></flux:label>
+                    <flux:select name="combustible" required>
+                        <flux:select.option value="">Selecciona el combustible</flux:select.option>
+                        @php($combustibles = ['Gasolina Magna', 'Gasolina Premium', 'Diésel'])
+                        @if (! in_array($vehiculo->combustible, $combustibles, true))
+                            <flux:select.option value="{{ $vehiculo->combustible }}" :selected="old('combustible', $vehiculo->combustible) === $vehiculo->combustible">{{ $vehiculo->combustible }}</flux:select.option>
+                        @endif
+                        @foreach ($combustibles as $combustible)
+                            <flux:select.option value="{{ $combustible }}" :selected="old('combustible', $vehiculo->combustible) === $combustible">{{ $combustible }}</flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="combustible" />
+                </div>
+                <div><flux:label>Kilometraje actual <span class="text-red-500">(*)</span></flux:label><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje', $vehiculo->kilometraje) }}" required /><flux:error name="kilometraje" /></div>
                 <div><flux:label>Fecha de adquisición <span class="text-red-500">(*)</span></flux:label><flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion', $vehiculo->fecha_adquisicion->format('Y-m-d')) }}" required /><flux:error name="fecha_adquisicion" /></div>
                 <div>
                     <flux:label>Estado <span class="text-red-500">(*)</span></flux:label>

@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('marca');
             $table->string('modelo');
             $table->year('anio');
-            $table->string('tipo');
+            $table->string('tipo vehiculo');
             $table->string('color');
-            $table->string('combustible');
-            $table->decimal('kilometraje', 10, 2)->default(0);
+            $table->string('tipo combustible');
+            $table->decimal('kilometraje actual', 10, 2)->default(0);
             $table->date('fecha_adquisicion');
             $table->string('estado')->default('Activo');
 

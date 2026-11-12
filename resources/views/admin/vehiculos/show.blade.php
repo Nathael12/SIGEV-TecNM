@@ -23,10 +23,10 @@
             <div><flux:label>Marca</flux:label><flux:input icon="truck" value="{{ $vehiculo->marca }}" readonly /></div>
             <div><flux:label>Modelo</flux:label><flux:input icon="truck" value="{{ $vehiculo->modelo }}" readonly /></div>
             <div><flux:label>Año</flux:label><flux:input value="{{ $vehiculo->anio }}" readonly /></div>
-            <div><flux:label>Tipo</flux:label><flux:input icon="squares-2x2" value="{{ $vehiculo->tipo }}" readonly /></div>
+            <div><flux:label>Tipo de vehículo</flux:label><flux:input icon="squares-2x2" value="{{ $vehiculo->tipo }}" readonly /></div>
             <div><flux:label>Color</flux:label><flux:input icon="swatch" value="{{ $vehiculo->color }}" readonly /></div>
-            <div><flux:label>Combustible</flux:label><flux:input icon="bolt" value="{{ $vehiculo->combustible }}" readonly /></div>
-            <div><flux:label>Kilometraje</flux:label><flux:input value="{{ number_format((float) $vehiculo->kilometraje, 2) }} km" readonly /></div>
+            <div><flux:label>Tipo de combustible</flux:label><flux:input icon="bolt" value="{{ $vehiculo->combustible }}" readonly /></div>
+            <div><flux:label>Kilometraje actual</flux:label><flux:input value="{{ number_format((float) $vehiculo->kilometraje, 2) }} km" readonly /></div>
             <div><flux:label>Fecha de adquisición</flux:label><flux:input icon="calendar-days" value="{{ $vehiculo->fecha_adquisicion->format('d/m/Y') }}" readonly /></div>
             <div><flux:label>Estado</flux:label><flux:input :icon="$vehiculo->estado === 'Activo' ? 'check-circle' : 'no-symbol'" value="{{ $vehiculo->estado }}" readonly /></div>
         </div>
