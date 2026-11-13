@@ -5,13 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Mantenimiento;
 use App\Models\Vehiculo;
 use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
+use App\Services\GenerarAlertasMantenimiento;
 use Illuminate\Http\Request;
 
 class MantenimientoController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, GenerarAlertasMantenimiento $generadorAlertas)
     {
-        $consulta = Mantenimiento::with('vehiculo')->orderByDesc('fecha_mantenimiento')->orderByDesc('id_mantenimiento');
+        $generadorAlertas->ejecutar();
+        $consulta = Mantenimiento::with([
+            'vehiculo',
+            'alertas' => fn ($consulta) => $consulta->orderByDesc('id'),
+        ])->orderByDesc('fecha_mantenimiento')->orderByDesc('id_mantenimiento');
 
         $mantenimientos = $consulta->get();
 

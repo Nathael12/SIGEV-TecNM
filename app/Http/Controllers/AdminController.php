@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Carbon;
+use App\Models\AlertaMantenimiento;
 use App\Models\Vehiculo;
 use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
+use App\Services\GenerarAlertasMantenimiento;
+use Illuminate\Support\Carbon;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(GenerarAlertasMantenimiento $generadorAlertas)
     {
+        $generadorAlertas->ejecutar();
+
         $rolUsuario = auth()->user()->getRoleNames()->implode(', ');
         $rolUsuario = $rolUsuario !== '' ? $rolUsuario : 'Usuario';
 
@@ -27,14 +31,21 @@ class AdminController extends Controller
             ['titulo' => 'Baja', 'cantidad' => $conteosPorEstado->get('Baja', 0), 'icono' => 'archive-box', 'color' => 'slate'],
         ];
 
-        $vehiculos = Vehiculo::orderBy('numero_economico')->get();
-        $alertasMantenimiento = ConsultaAlertasMantenimiento::obtener();
+       $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+
+        $alertasKilometraje = ConsultaAlertasMantenimiento::obtener();
+        $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
+            ->where('estado', 'activa')
+            ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
+            ->orderBy('fecha_mantenimiento')
+            ->get();
 
         return view('admin.index', [
             'dashboardDate' => Carbon::now()->locale('es')->translatedFormat('l, d \d\e F \d\e Y'),
             'rolUsuario' => $rolUsuario,
             'indicadoresVehiculos' => $indicadoresVehiculos,
             'vehiculos' => $vehiculos,
+            'alertasKilometraje' => $alertasKilometraje,
             'alertasMantenimiento' => $alertasMantenimiento,
         ]);
     }

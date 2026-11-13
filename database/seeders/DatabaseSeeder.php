@@ -43,9 +43,10 @@ class DatabaseSeeder extends Seeder
         */
 
         // El orden importa
-       $this->call([
+        $this->call([
             RoleSeeder::class,
             AdminUserSeeder::class,
+            ConfiguracionAlertasSeeder::class,
         ]);
 
         Ajuste::create([
