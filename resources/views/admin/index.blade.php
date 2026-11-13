@@ -47,6 +47,8 @@
                 @endforeach
             </section>
 
+            <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
+
             <x-alertas-documentos />
 
             <section aria-label="Flotilla de vehículos" class="space-y-5">
