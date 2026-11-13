@@ -17,13 +17,15 @@ class RoleSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // ---------- Roles ----------
-        $admin     = Role::firstOrCreate(['name' => 'Administrador',      'guard_name' => 'web']);
+        $admin = Role::firstOrCreate(['name' => 'Administrador',      'guard_name' => 'web']);
         $encargado = Role::firstOrCreate(['name' => 'Encargado Flotilla', 'guard_name' => 'web']);
 
         // ---------- Permisos ----------
         $permisos = [
             // Dashboard
             'ver dashboard',
+            'ver alertas mantenimiento',
+            'atender alertas mantenimiento',
 
             // Ajustes
             'ver ajustes',
@@ -56,6 +58,8 @@ class RoleSeeder extends Seeder
 
             // Mantenimiento
             'ver mantenimientos',
+            'ver alertas mantenimiento',
+            'atender alertas mantenimiento',
             'ver formulario crear mantenimiento',
             'guardar mantenimiento',
 
@@ -89,6 +93,8 @@ class RoleSeeder extends Seeder
             'ver detalle vehiculo',
 
             'ver mantenimientos',
+            'ver alertas mantenimiento',
+            'atender alertas mantenimiento',
             'ver formulario crear mantenimiento',
             'guardar mantenimiento',
 

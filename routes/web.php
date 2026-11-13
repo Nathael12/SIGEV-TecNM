@@ -30,6 +30,7 @@ require __DIR__.'/auth.php';
 //rutas para admin
 Route::get('/dashboard', function () { return redirect()->route('admin.index'); })->name('dashboard')->middleware(['auth', 'can:ver dashboard']);
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware(['auth', 'can:ver dashboard']);
+Route::post('/admin/alertas-mantenimiento/{alerta}/atender', [App\Http\Controllers\AlertaMantenimientoController::class, 'atender'])->name('admin.alertas.atender')->middleware(['auth', 'can:atender alertas mantenimiento']);
 
 
 //rutas para ajustes

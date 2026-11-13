@@ -49,6 +49,37 @@
 
             <x-alertas-documentos />
 
+            @if (session('mensaje'))
+                <div role="status" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200">{{ session('mensaje') }}</div>
+            @endif
+
+            @can('ver alertas mantenimiento')
+                @foreach ($alertasMantenimiento as $alerta)
+                    @php($diasRestantes = (int) now()->startOfDay()->diffInDays($alerta->fecha_mantenimiento, false))
+                    <div role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm {{ $alerta->tipo === 'vencida' ? 'border-red-300 bg-red-50 text-red-900 dark:bg-red-950/30 dark:text-red-200' : 'border-amber-300 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:text-amber-200' }}">
+                        <p>
+                            <strong>{{ $alerta->tipo === 'vencida' ? 'Mantenimiento vencido:' : 'Próximo mantenimiento:' }}</strong>
+                            {{ $alerta->mantenimiento->vehiculo->marca }} {{ $alerta->mantenimiento->vehiculo->modelo }} ({{ $alerta->mantenimiento->vehiculo->numero_economico }}) · {{ $alerta->mantenimiento->categoria_mantenimiento }} · {{ $alerta->fecha_mantenimiento->format('d/m/Y') }}
+                            <span class="font-semibold">
+                                @if ($diasRestantes < 0)
+                                    · Venció hace {{ abs($diasRestantes) }} {{ abs($diasRestantes) === 1 ? 'día' : 'días' }}
+                                @elseif ($diasRestantes === 0)
+                                    · Vence hoy
+                                @else
+                                    · Faltan {{ $diasRestantes }} {{ $diasRestantes === 1 ? 'día' : 'días' }}
+                                @endif
+                            </span>
+                        </p>
+                        @can('atender alertas mantenimiento')
+                            <form method="POST" action="{{ route('admin.alertas.atender', $alerta) }}">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center rounded-lg border border-current/20 bg-white/70 px-3 py-2 text-sm font-semibold shadow-sm transition hover:bg-white dark:bg-zinc-900/50 dark:hover:bg-zinc-900">Marcar como atendida</button>
+                            </form>
+                        @endcan
+                    </div>
+                @endforeach
+            @endcan
+
             <section aria-label="Flotilla de vehículos" class="space-y-5">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
