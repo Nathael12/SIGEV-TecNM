@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Carbon;
 use App\Models\Vehiculo;
+use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
 
 class AdminController extends Controller
 {
@@ -27,12 +28,14 @@ class AdminController extends Controller
         ];
 
         $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+        $alertasMantenimiento = ConsultaAlertasMantenimiento::obtener();
 
         return view('admin.index', [
             'dashboardDate' => Carbon::now()->locale('es')->translatedFormat('l, d \d\e F \d\e Y'),
             'rolUsuario' => $rolUsuario,
             'indicadoresVehiculos' => $indicadoresVehiculos,
             'vehiculos' => $vehiculos,
+            'alertasMantenimiento' => $alertasMantenimiento,
         ]);
     }
 }

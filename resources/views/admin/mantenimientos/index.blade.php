@@ -6,6 +6,9 @@
     @if (session('mensaje'))
         <div class="mb-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
     @endif
+    <div class="mb-6">
+        <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
+    </div>
     <div class="flex justify-end">
         <a href="{{ route('admin.mantenimientos.create') }}" class="inline-flex items-center rounded bg-blue-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-600"><i class="fas fa-plus mr-2"></i> Registrar mantenimiento</a>
     </div>
