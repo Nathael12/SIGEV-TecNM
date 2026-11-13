@@ -61,6 +61,7 @@ class VehiculoController extends Controller
             return back()->withInput()->withErrors(['fotografia' => 'No se pudo guardar la fotografía. Inténtalo de nuevo.']);
         }
 
+        $datos = $this->mapearColumnasVehiculo($datos);
         $datos['fotografia'] = $rutaFotografia;
         $vehiculo = Vehiculo::create($datos);
         return redirect()->route('admin.vehiculos.index')
@@ -111,6 +112,7 @@ class VehiculoController extends Controller
         ]);
 
         unset($datos['fotografia']);
+        $datos = $this->mapearColumnasVehiculo($datos);
         $fotografiaAnterior = $vehiculo->fotografia;
         if ($request->hasFile('fotografia')) {
             $rutaFotografia = $request->file('fotografia')->store('vehiculos', 'public');
@@ -142,5 +144,17 @@ class VehiculoController extends Controller
 
         return redirect()->route('admin.vehiculos.index')
             ->with('mensaje', 'Vehículo eliminado correctamente');
+    }
+
+    /** Convierte los nombres del formulario a los nombres existentes en la tabla. */
+    private function mapearColumnasVehiculo(array $datos): array
+    {
+        $datos['tipo vehiculo'] = $datos['tipo'];
+        $datos['tipo combustible'] = $datos['combustible'];
+        $datos['kilometraje actual'] = $datos['kilometraje'];
+
+        unset($datos['tipo'], $datos['combustible'], $datos['kilometraje']);
+
+        return $datos;
     }
 }

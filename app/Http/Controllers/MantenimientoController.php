@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mantenimiento;
 use App\Models\Vehiculo;
 use App\Services\GenerarAlertasMantenimiento;
+use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
 use Illuminate\Http\Request;
 
 class MantenimientoController extends Controller
@@ -19,7 +20,10 @@ class MantenimientoController extends Controller
 
         $mantenimientos = $consulta->get();
 
-        return view('admin.mantenimientos.index', compact('mantenimientos'));
+        return view('admin.mantenimientos.index', [
+            'mantenimientos' => $mantenimientos,
+            'alertasMantenimiento' => ConsultaAlertasMantenimiento::obtener(),
+        ]);
     }
 
     public function create()

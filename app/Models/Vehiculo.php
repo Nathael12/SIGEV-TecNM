@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class Vehiculo extends Model
@@ -18,10 +19,10 @@ class Vehiculo extends Model
         'marca',
         'modelo',
         'anio',
-        'tipo',
+        'tipo vehiculo',
         'color',
-        'combustible',
-        'kilometraje',
+        'tipo combustible',
+        'kilometraje actual',
         'fecha_adquisicion',
         'estado',
         'fotografia',
@@ -29,7 +30,7 @@ class Vehiculo extends Model
 
     protected $casts = [
         'anio' => 'integer',
-        'kilometraje' => 'decimal:2',
+        'kilometraje actual' => 'decimal:2',
         'fecha_adquisicion' => 'date',
     ];
 
@@ -45,5 +46,10 @@ class Vehiculo extends Model
     public function mantenimientos(): HasMany
     {
         return $this->hasMany(Mantenimiento::class, 'vehiculo_id', 'id_vehiculo');
+    }
+
+    public function ultimoMantenimiento(): HasOne
+    {
+        return $this->hasOne(Mantenimiento::class, 'vehiculo_id', 'id_vehiculo')->latestOfMany('id_mantenimiento');
     }
 }

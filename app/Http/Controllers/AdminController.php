@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AlertaMantenimiento;
 use App\Models\Vehiculo;
 use App\Services\GenerarAlertasMantenimiento;
+use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
 use Illuminate\Support\Carbon;
 
 class AdminController extends Controller
@@ -31,6 +32,7 @@ class AdminController extends Controller
         ];
 
         $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+        $alertasKilometraje = ConsultaAlertasMantenimiento::obtener();
         $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
             ->where('estado', 'activa')->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
             ->orderBy('fecha_mantenimiento')->get();
@@ -40,6 +42,7 @@ class AdminController extends Controller
             'rolUsuario' => $rolUsuario,
             'indicadoresVehiculos' => $indicadoresVehiculos,
             'vehiculos' => $vehiculos,
+            'alertasKilometraje' => $alertasKilometraje,
             'alertasMantenimiento' => $alertasMantenimiento,
         ]);
     }

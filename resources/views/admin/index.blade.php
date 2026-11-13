@@ -47,6 +47,8 @@
                 @endforeach
             </section>
 
+            <x-alertas-mantenimiento :alertas="$alertasKilometraje" />
+
             <x-alertas-documentos />
 
             @if (session('mensaje'))
