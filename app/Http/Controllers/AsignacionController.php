@@ -12,6 +12,13 @@ use Illuminate\Validation\ValidationException;
 class AsignacionController extends Controller
 {
     /**
+     * Nombre de la columna del kilometraje en la tabla vehiculos.
+     * Hoy la BD la tiene como "kilometraje actual" (con espacio). Cuando se corrija
+     * a kilometraje_actual en la migración, solo hay que cambiar esta línea.
+     */
+    private const COL_KM = 'kilometraje actual';
+
+    /**
      * Solo se pueden asignar vehículos en estado Disponible (RN-03).
      */
     private function vehiculosDisponibles()
@@ -89,7 +96,7 @@ class AsignacionController extends Controller
 
         // Kilometraje vigente de cada vehículo, para sugerirlo en el formulario
         $kilometrajes = $vehiculos->mapWithKeys(
-            fn ($v) => [$v->id_vehiculo => (float) $v->kilometraje]
+            fn ($v) => [$v->id_vehiculo => (float) $v->{self::COL_KM}]
         );
 
         return view('admin.asignaciones.create', compact('vehiculos', 'solicitantes', 'kilometrajes'));
@@ -154,10 +161,10 @@ class AsignacionController extends Controller
             }
 
             // RN-05 / RF-19: el kilometraje inicial no puede ser menor al vigente del vehículo
-            if ($request->kilometraje_inicial < (float) $vehiculo->kilometraje) {
+            if ($request->kilometraje_inicial < (float) $vehiculo->{self::COL_KM}) {
                 throw ValidationException::withMessages([
                     'kilometraje_inicial' => 'No puede ser menor al kilometraje actual del vehículo ('
-                        . $this->formatoKm($vehiculo->kilometraje) . ' km).',
+                        . $this->formatoKm($vehiculo->{self::COL_KM}) . ' km).',
                 ]);
             }
 
@@ -190,7 +197,7 @@ class AsignacionController extends Controller
         return view('admin.asignaciones.show', compact('asignacion'));
     }
 
-/**
+    /**
      * Formulario de corrección de una asignación (solo Administrador, RN-08).
      */
     public function edit(string $id)
@@ -321,8 +328,8 @@ class AsignacionController extends Controller
 
             // Si es la última asignación del vehículo y este conservaba el kilometraje
             // final anterior, se actualiza al corregido (RF-20: datos consistentes)
-            if ($finalizada && ! $siguiente && (float) $vehiculo->kilometraje === (float) $kmFinalAnterior) {
-                $vehiculo->kilometraje = $request->kilometraje_final;
+            if ($finalizada && ! $siguiente && (float) $vehiculo->{self::COL_KM} === (float) $kmFinalAnterior) {
+                $vehiculo->{self::COL_KM} = $request->kilometraje_final;
                 $vehiculo->save();
             }
         });
@@ -393,10 +400,10 @@ class AsignacionController extends Controller
             }
 
             // El vehículo no puede retroceder su kilometraje vigente
-            if ($request->kilometraje_final < (float) $vehiculo->kilometraje) {
+            if ($request->kilometraje_final < (float) $vehiculo->{self::COL_KM}) {
                 throw ValidationException::withMessages([
                     'kilometraje_final' => 'No puede ser menor al kilometraje actual del vehículo ('
-                        . $this->formatoKm($vehiculo->kilometraje) . ' km).',
+                        . $this->formatoKm($vehiculo->{self::COL_KM}) . ' km).',
                 ]);
             }
 
@@ -406,8 +413,8 @@ class AsignacionController extends Controller
             $asignacion->save();
 
             // RF-20: el kilometraje vigente pasa a ser el final y el vehículo cambia de estado
-            $vehiculo->kilometraje = $request->kilometraje_final;
-            $vehiculo->estado      = $request->estado_vehiculo;
+            $vehiculo->{self::COL_KM} = $request->kilometraje_final;
+            $vehiculo->estado             = $request->estado_vehiculo;
             $vehiculo->save();
         });
 
