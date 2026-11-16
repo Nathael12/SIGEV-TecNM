@@ -22,7 +22,7 @@ class DocumentoController extends Controller
             'importe'               => 'required|numeric|min:0|max:99999999.99',
             // RF-13: solo PDF o imágenes, máximo 5 MB (5120 KB)
             'archivo'               => ($archivoObligatorio ? 'required' : 'nullable')
-                . '|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                . '|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
         ];
     }
 
@@ -40,6 +40,7 @@ class DocumentoController extends Controller
             'vigencia_fin.after_or_equal' => 'La vigencia final no puede ser anterior a la inicial.',
             'archivo.required'            => 'Debes adjuntar un archivo.',
             'archivo.mimes'               => 'Solo se permiten archivos PDF, JPG o PNG.',
+            'archivo.mimetypes'      => 'Solo se permiten archivos PDF, JPG o PNG.',
             'archivo.max'                 => 'El archivo no puede pesar más de 5 MB.',
             'archivo.uploaded'            => 'No se pudo subir el archivo. Puede superar el tamaño permitido.',
         ];

@@ -19,6 +19,7 @@ class RoleSeeder extends Seeder
         // ---------- Roles ----------
         $admin     = Role::firstOrCreate(['name' => 'Administrador',      'guard_name' => 'web']);
         $encargado = Role::firstOrCreate(['name' => 'Encargado Flotilla', 'guard_name' => 'web']);
+        $solicitante = Role::firstOrCreate(['name' => 'Solicitante', 'guard_name' => 'web']);
 
         // ---------- Permisos ----------
         $permisos = [
@@ -68,6 +69,16 @@ class RoleSeeder extends Seeder
             'actualizar documento',
             'eliminar documento',
             'descargar documento',
+
+            // Asignaciones
+            'ver asignaciones',
+            'ver formulario crear asignacion',
+            'guardar asignacion',
+            'ver detalle asignacion',
+            'ver formulario devolucion',
+            'registrar devolucion',
+            'ver formulario editar asignacion',
+            'actualizar asignacion',
         ];
 
         foreach ($permisos as $permiso) {
@@ -97,6 +108,14 @@ class RoleSeeder extends Seeder
             'guardar documento',
             'ver detalle documento',
             'descargar documento',
+
+            // Asignaciones
+            'ver asignaciones',
+            'ver formulario crear asignacion',
+            'guardar asignacion',
+            'ver detalle asignacion',
+            'ver formulario devolucion',
+            'registrar devolucion',
         ]);
     }
 }

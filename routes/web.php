@@ -83,3 +83,13 @@ Route::put('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::c
 Route::delete('/admin/documento/{id}', [App\Http\Controllers\DocumentoController::class, 'destroy'])->name('admin.documentos.destroy')->middleware(['auth', 'can:eliminar documento']);
 Route::get('/admin/documento/{id}/descargar', [App\Http\Controllers\DocumentoController::class, 'descargar'])->name('admin.documentos.descargar')->middleware(['auth', 'can:descargar documento']);
 Route::get('/admin/documento/{id}/archivo', [App\Http\Controllers\DocumentoController::class, 'archivo'])->name('admin.documentos.archivo')->middleware(['auth', 'can:ver detalle documento']);
+
+//rutas para asignaciones
+Route::get('/admin/asignaciones', [App\Http\Controllers\AsignacionController::class, 'index'])->name('admin.asignaciones.index')->middleware(['auth', 'can:ver asignaciones']);
+Route::get('/admin/asignaciones/create', [App\Http\Controllers\AsignacionController::class, 'create'])->name('admin.asignaciones.create')->middleware(['auth', 'can:ver formulario crear asignacion']);
+Route::post('/admin/asignaciones/create', [App\Http\Controllers\AsignacionController::class, 'store'])->name('admin.asignaciones.store')->middleware(['auth', 'can:guardar asignacion']);
+Route::get('/admin/asignacion/{id}', [App\Http\Controllers\AsignacionController::class, 'show'])->name('admin.asignaciones.show')->middleware(['auth', 'can:ver detalle asignacion']);
+Route::get('/admin/asignacion/{id}/edit', [App\Http\Controllers\AsignacionController::class, 'edit'])->name('admin.asignaciones.edit')->middleware(['auth', 'can:ver formulario editar asignacion']);
+Route::put('/admin/asignacion/{id}', [App\Http\Controllers\AsignacionController::class, 'update'])->name('admin.asignaciones.update')->middleware(['auth', 'can:actualizar asignacion']);
+Route::get('/admin/asignacion/{id}/devolucion', [App\Http\Controllers\AsignacionController::class, 'devolucion'])->name('admin.asignaciones.devolucion')->middleware(['auth', 'can:ver formulario devolucion']);
+Route::put('/admin/asignacion/{id}/devolucion', [App\Http\Controllers\AsignacionController::class, 'devolver'])->name('admin.asignaciones.devolver')->middleware(['auth', 'can:registrar devolucion']);
