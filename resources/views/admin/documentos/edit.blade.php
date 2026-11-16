@@ -138,7 +138,7 @@
 
                             <div style="flex:1;min-width:0;">
                                 <input type="file" name="archivo" id="archivo-input"
-                                    accept=".pdf,.jpg,.jpeg,.png,image/*,application/pdf" style="display:none;">
+                                    accept=".pdf,.jpg,.jpeg,.png" style="display:none;">
                                 <label for="archivo-input"
                                     style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid #94a3b8;border-radius:8px;font-size:14px;font-weight:700;">
                                     <flux:icon name="cloud-arrow-up" variant="micro" />
@@ -177,7 +177,58 @@
             texto: @json($textoActual),
         };
 
-        document.getElementById('archivo-input').addEventListener('change', function () {
+        const extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png'];
+        const tamanoMaximo = 5 * 1024 * 1024; // 5 MB
+
+        // Lee los primeros bytes del archivo para saber qué es en realidad.
+        // Así se detectan archivos a los que solo les cambiaron la extensión.
+        function tipoReal(archivo) {
+            return new Promise((resolve) => {
+                const lector = new FileReader();
+                lector.onload = () => {
+                    const b = new Uint8Array(lector.result);
+                    const texto = String.fromCharCode(...b);
+
+                    if (texto.includes('%PDF')) return resolve('pdf');
+                    if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) return resolve('png');
+                    if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return resolve('jpg');
+                    resolve(null);
+                };
+                lector.onerror = () => resolve(null);
+                lector.readAsArrayBuffer(archivo.slice(0, 1024));
+            });
+        }
+
+        function mostrarError(titulo, texto) {
+            if (window.Swal) {
+                Swal.fire({ icon: 'error', title: titulo, text: texto });
+            } else {
+                alert(titulo + '\n' + texto);
+            }
+        }
+
+        function restaurar() {
+            const imagen = document.getElementById('image-preview');
+            const icono = document.getElementById('placeholder-icon');
+            document.getElementById('file-name').textContent = original.texto;
+
+            if (original.esImagen) {
+                imagen.src = original.url;
+                imagen.style.display = 'block';
+                icono.style.display = 'none';
+            } else {
+                imagen.style.display = 'none';
+                icono.style.display = 'flex';
+            }
+        }
+
+        function rechazar(input, titulo, texto) {
+            input.value = '';
+            restaurar();
+            mostrarError(titulo, texto);
+        }
+
+        document.getElementById('archivo-input').addEventListener('change', async function () {
             const archivo = this.files[0];
             const imagen = document.getElementById('image-preview');
             const icono = document.getElementById('placeholder-icon');
@@ -185,22 +236,30 @@
 
             // Sin selección: se vuelve a mostrar el archivo actual
             if (!archivo) {
-                nombre.textContent = original.texto;
-                if (original.esImagen) {
-                    imagen.src = original.url;
-                    imagen.style.display = 'block';
-                    icono.style.display = 'none';
-                } else {
-                    imagen.style.display = 'none';
-                    icono.style.display = 'flex';
-                }
+                restaurar();
                 return;
+            }
+
+            const extension = archivo.name.split('.').pop().toLowerCase();
+
+            if (!extensionesPermitidas.includes(extension)) {
+                return rechazar(this, 'Formato no permitido', 'Solo se aceptan archivos PDF, JPG o PNG.');
+            }
+
+            if (archivo.size > tamanoMaximo) {
+                return rechazar(this, 'Archivo demasiado grande', 'El archivo no puede pesar más de 5 MB.');
+            }
+
+            const real = await tipoReal(archivo);
+            if (!real) {
+                return rechazar(this, 'Archivo no válido',
+                    'El contenido no corresponde a un PDF, JPG o PNG. Puede que solo le hayan cambiado la extensión.');
             }
 
             const mb = (archivo.size / 1024 / 1024).toFixed(2);
             nombre.textContent = 'Nuevo archivo: ' + archivo.name + ' (' + mb + ' MB)';
 
-            if (archivo.type.startsWith('image/')) {
+            if (real === 'png' || real === 'jpg') {
                 imagen.src = URL.createObjectURL(archivo);
                 imagen.style.display = 'block';
                 icono.style.display = 'none';

@@ -34,6 +34,12 @@
                     </flux:navlist.item>
                      @endcan
 
+                    @can('ver asignaciones')
+                    <flux:navlist.item icon="key" :href="url('/admin/asignaciones')"
+                        :current="request()->is('admin/asignacion*')" wire:navigate>{{ __('Asignaciones') }}
+                    </flux:navlist.item>
+                    @endcan
+
                     @can('ver mantenimientos')
                     <flux:navlist.item icon="wrench" :href="route('admin.mantenimientos.index')"
                         :current="request()->routeIs('admin.mantenimientos.*')" wire:navigate>
