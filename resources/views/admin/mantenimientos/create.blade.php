@@ -23,8 +23,8 @@
                 <div><flux:label>Categoría <span class="text-red-500">(*)</span></flux:label><flux:input name="categoria_mantenimiento" maxlength="45" value="{{ old('categoria_mantenimiento') }}" required /><flux:error name="categoria_mantenimiento" /></div>
                 <div class="sm:col-span-2 lg:col-span-3"><flux:label>Descripción del servicio <span class="text-red-500">(*)</span></flux:label><flux:textarea name="descripcion_mantenimiento" maxlength="255" required>{{ old('descripcion_mantenimiento') }}</flux:textarea><flux:error name="descripcion_mantenimiento" /></div>
                 <div><flux:label>Monto <span class="text-red-500">(*)</span></flux:label><flux:input name="monto_mantenimiento" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('monto_mantenimiento') }}" required /><flux:error name="monto_mantenimiento" /></div>
-                <div><flux:label>Fecha del próximo mantenimiento <span class="text-red-500">(*)</span></flux:label><flux:input name="proximo_mantenimiento_fecha" type="date" value="{{ old('proximo_mantenimiento_fecha') }}" required /><flux:error name="proximo_mantenimiento_fecha" /></div>
-                <div><flux:label>Kilometraje del próximo mantenimiento <span class="text-red-500">(*)</span></flux:label><flux:input name="proximo_mantenimiento_km" type="number" min="0" step="1" value="{{ old('proximo_mantenimiento_km') }}" required /><flux:error name="proximo_mantenimiento_km" /></div>
+                <div><flux:label>Fecha del próximo mantenimiento <span class="text-gray-500">(opcional)</span></flux:label><flux:input name="proximo_mantenimiento_fecha" type="date" value="{{ old('proximo_mantenimiento_fecha') }}" /><flux:error name="proximo_mantenimiento_fecha" /></div>
+                <div><flux:label>Kilometraje del próximo mantenimiento <span class="text-gray-500">(opcional)</span></flux:label><flux:input name="proximo_mantenimiento_km" type="number" min="0" step="1" value="{{ old('proximo_mantenimiento_km') }}" /><flux:error name="proximo_mantenimiento_km" /></div>
             </div>
             <div class="flex justify-end gap-2 px-6 pb-6">
                 <a href="{{ route('admin.mantenimientos.index') }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600">Cancelar</a>
@@ -32,4 +32,23 @@
             </div>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const kilometrajes = @json($vehiculos->mapWithKeys(fn ($vehiculo) => [$vehiculo->getKey() => (int) round((float) $vehiculo->{'kilometraje actual'})]));
+            const vehiculoSelect = document.querySelector('select[name="vehiculo_id"]');
+            const kilometrajeInput = document.querySelector('input[name="kilometraje_mantenimiento"]');
+
+            if (!vehiculoSelect || !kilometrajeInput) return;
+
+            const actualizarKilometraje = (sobrescribir = true) => {
+                const kilometraje = kilometrajes[vehiculoSelect.value];
+                if (kilometraje !== undefined && (sobrescribir || kilometrajeInput.value === '')) {
+                    kilometrajeInput.value = kilometraje;
+                }
+            };
+
+            vehiculoSelect.addEventListener('change', () => actualizarKilometraje());
+            actualizarKilometraje(false);
+        });
+    </script>
 </x-layouts.app>

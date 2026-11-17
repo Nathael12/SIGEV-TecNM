@@ -63,6 +63,9 @@ class RoleSeeder extends Seeder
             'atender alertas mantenimiento',
             'ver formulario crear mantenimiento',
             'guardar mantenimiento',
+            'editar mantenimiento',
+            'actualizar mantenimiento',
+            'eliminar mantenimiento',
 
             // Documentos
             'ver documentos',
@@ -108,6 +111,9 @@ class RoleSeeder extends Seeder
             'atender alertas mantenimiento',
             'ver formulario crear mantenimiento',
             'guardar mantenimiento',
+            'editar mantenimiento',
+            'actualizar mantenimiento',
+            'eliminar mantenimiento',
 
             'ver documentos',
             'ver formulario crear documento',

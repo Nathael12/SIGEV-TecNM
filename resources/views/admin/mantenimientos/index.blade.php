@@ -19,6 +19,7 @@
                     <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">{{ $encabezado }}</th>
                 @endforeach
                 <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Alerta</th>
+                <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Acciones</th>
             </tr></thead>
             <tbody>
                 @forelse ($mantenimientos as $mantenimiento)
@@ -31,7 +32,7 @@
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->fecha_mantenimiento->format('d/m/Y') }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ number_format($mantenimiento->kilometraje_mantenimiento) }} km</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">${{ number_format((float) $mantenimiento->monto_mantenimiento, 2) }}</td>
-                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha->format('d/m/Y') }} · {{ number_format($mantenimiento->proximo_mantenimiento_km) }} km</td>
+                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha?->format('d/m/Y') ?? 'Sin fecha' }} · {{ $mantenimiento->proximo_mantenimiento_km !== null ? number_format($mantenimiento->proximo_mantenimiento_km) . ' km' : 'Sin kilometraje' }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
                             @if ($mantenimiento->alertas->isNotEmpty())
                                 @php($alerta = $mantenimiento->alertas->first())
@@ -51,9 +52,23 @@
                                 <span class="text-gray-400">—</span>
                             @endif
                         </td>
+                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
+                            <div class="flex items-center justify-center gap-2">
+                                @can('editar mantenimiento')
+                                    <a href="{{ route('admin.mantenimientos.edit', $mantenimiento) }}" class="rounded bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600">Editar</a>
+                                @endcan
+                                @can('eliminar mantenimiento')
+                                    <form action="{{ route('admin.mantenimientos.destroy', $mantenimiento) }}" method="POST" onsubmit="return confirm('¿Eliminar este mantenimiento? Esta acción no se puede deshacer.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="rounded bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">Eliminar</button>
+                                    </form>
+                                @endcan
+                            </div>
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="10" class="border border-gray-200 px-3 py-6 text-center text-sm text-gray-500 dark:border-zinc-700">No hay mantenimientos registrados para los filtros seleccionados.</td></tr>
+                    <tr><td colspan="11" class="border border-gray-200 px-3 py-6 text-center text-sm text-gray-500 dark:border-zinc-700">No hay mantenimientos registrados para los filtros seleccionados.</td></tr>
                 @endforelse
             </tbody>
         </table>

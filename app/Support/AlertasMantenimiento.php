@@ -16,7 +16,9 @@ class AlertasMantenimiento
             ->filter(function (Vehiculo $vehiculo) use ($kilometrosAlerta) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;
 
-                return $mantenimiento && $vehiculo->kilometraje >= $mantenimiento->proximo_mantenimiento_km - $kilometrosAlerta;
+                return $mantenimiento
+                    && $mantenimiento->proximo_mantenimiento_km !== null
+                    && $vehiculo->kilometraje >= $mantenimiento->proximo_mantenimiento_km - $kilometrosAlerta;
             })
             ->map(function (Vehiculo $vehiculo) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;

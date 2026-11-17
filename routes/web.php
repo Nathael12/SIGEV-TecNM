@@ -72,6 +72,9 @@ Route::delete('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController:
 Route::get('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'index'])->name('admin.mantenimientos.index')->middleware(['auth', 'can:ver mantenimientos']);
 Route::get('/admin/mantenimientos/create', [App\Http\Controllers\MantenimientoController::class, 'create'])->name('admin.mantenimientos.create')->middleware(['auth', 'can:ver formulario crear mantenimiento']);
 Route::post('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'store'])->name('admin.mantenimientos.store')->middleware(['auth', 'can:guardar mantenimiento']);
+Route::get('/admin/mantenimientos/{mantenimiento}/edit', [App\Http\Controllers\MantenimientoController::class, 'edit'])->name('admin.mantenimientos.edit')->middleware(['auth', 'can:editar mantenimiento']);
+Route::put('/admin/mantenimientos/{mantenimiento}', [App\Http\Controllers\MantenimientoController::class, 'update'])->name('admin.mantenimientos.update')->middleware(['auth', 'can:actualizar mantenimiento']);
+Route::delete('/admin/mantenimientos/{mantenimiento}', [App\Http\Controllers\MantenimientoController::class, 'destroy'])->name('admin.mantenimientos.destroy')->middleware(['auth', 'can:eliminar mantenimiento']);
 
 
 //rutas para documentos
