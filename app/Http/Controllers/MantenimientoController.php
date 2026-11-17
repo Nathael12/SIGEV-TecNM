@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Mantenimiento;
 use App\Models\Vehiculo;
-use App\Services\GenerarAlertasMantenimiento;
 use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
+use App\Services\GenerarAlertasMantenimiento;
 use Illuminate\Http\Request;
 
 class MantenimientoController extends Controller

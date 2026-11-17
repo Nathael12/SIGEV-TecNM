@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\AlertaMantenimiento;
 use App\Models\Vehiculo;
-use App\Services\GenerarAlertasMantenimiento;
 use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
+use App\Services\GenerarAlertasMantenimiento;
 use Illuminate\Support\Carbon;
 
 class AdminController extends Controller
@@ -31,11 +31,14 @@ class AdminController extends Controller
             ['titulo' => 'Baja', 'cantidad' => $conteosPorEstado->get('Baja', 0), 'icono' => 'archive-box', 'color' => 'slate'],
         ];
 
-        $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+       $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+
         $alertasKilometraje = ConsultaAlertasMantenimiento::obtener();
         $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
-            ->where('estado', 'activa')->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
-            ->orderBy('fecha_mantenimiento')->get();
+            ->where('estado', 'activa')
+            ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
+            ->orderBy('fecha_mantenimiento')
+            ->get();
 
         return view('admin.index', [
             'dashboardDate' => Carbon::now()->locale('es')->translatedFormat('l, d \d\e F \d\e Y'),
