@@ -7,29 +7,44 @@ use Illuminate\Support\Collection;
 
 class AlertasMantenimiento
 {
+    public static function evaluarKilometraje(float $actual, int $limite): ?array
+    {
+        $restantes = $limite - $actual;
+
+        if ($restantes > (int) config('maintenance.kilometers_alert', 500)) {
+            return null;
+        }
+
+        return [
+            'condicion' => $restantes <= 0 ? 'Vencido' : 'Próximo',
+            'kilometros_restantes' => $restantes,
+        ];
+    }
+
     public static function obtener(): Collection
     {
-        $kilometrosAlerta = (int) config('maintenance.kilometers_alert', 500);
-
         return Vehiculo::with('ultimoMantenimiento')
             ->get()
-            ->filter(function (Vehiculo $vehiculo) use ($kilometrosAlerta) {
+            ->filter(function (Vehiculo $vehiculo) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;
 
-                return $mantenimiento
-                    && $mantenimiento->proximo_mantenimiento_km !== null
-                    && $vehiculo->kilometraje >= $mantenimiento->proximo_mantenimiento_km - $kilometrosAlerta;
+                return $mantenimiento && self::evaluarKilometraje(
+                    (float) $vehiculo->{'kilometraje actual'},
+                    (int) $mantenimiento->proximo_mantenimiento_km
+                ) !== null;
             })
             ->map(function (Vehiculo $vehiculo) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;
-                $actual = (float) $vehiculo->kilometraje;
-                $limite = (int) $mantenimiento->proximo_mantenimiento_km;
-                $vehiculo->setAttribute('condicion_mantenimiento', $actual > $limite ? 'Vencido' : ($actual >= $limite ? 'Requiere mantenimiento' : 'Próximo'));
-                $vehiculo->setAttribute('kilometros_restantes', $limite - $actual);
+                $evaluacion = self::evaluarKilometraje(
+                    (float) $vehiculo->{'kilometraje actual'},
+                    (int) $mantenimiento->proximo_mantenimiento_km
+                );
+                $vehiculo->setAttribute('condicion_mantenimiento', $evaluacion['condicion']);
+                $vehiculo->setAttribute('kilometros_restantes', $evaluacion['kilometros_restantes']);
 
                 return $vehiculo;
             })
-            ->sortBy(fn (Vehiculo $vehiculo) => $vehiculo->ultimoMantenimiento->proximo_mantenimiento_km - $vehiculo->kilometraje)
+            ->sortBy(fn (Vehiculo $vehiculo) => $vehiculo->kilometros_restantes)
             ->values();
     }
 }
