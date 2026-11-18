@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Testing\Fluent\Concerns\Has;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
 {
@@ -37,6 +38,7 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'name'             => ['required', 'string', 'min:4', 'max:20', 'regex:/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', Rule::unique('users', 'name')],
             'nombre_usuario'   => 'required|string|max:255',
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'required|string|max:255',
@@ -45,10 +47,18 @@ class UsuarioController extends Controller
             'rol'              => 'required|exists:roles,name',
             'estado'           => 'required|in:Activo,Inactivo',
             'password'         => 'required|min:8|confirmed',
+        ], [
+            'name.required' => 'El nombre de usuario es obligatorio.',
+            'name.min' => 'El nombre de usuario debe tener al menos 4 caracteres.',
+            'name.max' => 'El nombre de usuario no puede superar 20 caracteres.',
+            'name.regex' => 'Usa de 4 a 20 caracteres: letras, números y guion bajo; debe comenzar con una letra.',
+            'name.unique' => 'Ese nombre de usuario ya está registrado.',
         ]);
 
         $usuario = new User();
-        $usuario->name = $request->nombre_usuario . ' ' . $request->apellido_paterno;
+        // Implementación anterior conservada: guardaba el nombre real en users.name.
+        // $usuario->name = $request->nombre_usuario . ' ' . $request->apellido_paterno;
+        $usuario->name            = $request->name;
         $usuario->email            = $request->correo_usuario;
         $usuario->nombre_usuario   = $request->nombre_usuario;
         $usuario->apellido_paterno = $request->apellido_paterno;
@@ -90,6 +100,7 @@ class UsuarioController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
+            'name'             => ['required', 'string', 'min:4', 'max:20', 'regex:/^[a-zA-Z][a-zA-Z0-9_]{3,19}$/', Rule::unique('users', 'name')->ignore($id)],
             'rol'              => 'required|string|exists:roles,name',
             'correo_usuario'   => 'required|email|max:255|unique:users,email,' . $id,
             'password'         => 'nullable|string|confirmed|min:8',
@@ -98,10 +109,18 @@ class UsuarioController extends Controller
             'apellido_materno' => 'required|string|max:255',
             'telefono_usuario' => 'required|digits:10',
 
+        ], [
+            'name.required' => 'El nombre de usuario es obligatorio.',
+            'name.min' => 'El nombre de usuario debe tener al menos 4 caracteres.',
+            'name.max' => 'El nombre de usuario no puede superar 20 caracteres.',
+            'name.regex' => 'Usa de 4 a 20 caracteres: letras, números y guion bajo; debe comenzar con una letra.',
+            'name.unique' => 'Ese nombre de usuario ya está registrado.',
         ]);
  
         $usuario = User::findOrFail($id);
-        $usuario->name  = $request->nombre_usuario . ' ' . $request->apellido_paterno;
+        // Implementación anterior conservada: guardaba el nombre real en users.name.
+        // $usuario->name = $request->nombre_usuario . ' ' . $request->apellido_paterno;
+        $usuario->name  = $request->name;
         $usuario->email = $request->correo_usuario;
  
         if ($request->filled('password')) {
