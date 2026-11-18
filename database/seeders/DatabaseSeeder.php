@@ -2,11 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ajuste;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -47,19 +43,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             ConfiguracionAlertasSeeder::class,
-        ]);
-
-        Ajuste::create([
-            'nombre'      => 'Mi Empresa',
-            'descripcion' => 'Descripcion de la empresa',
-            'direccion'   => 'Av. Principal',
-            'telefono'    => '9999999999',
-            'email'       => 'info@miempresa.com',
-            'divisa'      => 'Bs',
-            'logo'        => null,
-            'web'         => 'https://www.miempresa.com',
-            'interes'     => 10.00,
-            'mora'        => 2.00,
+            AjusteSeeder::class,
         ]);
     }
 }
