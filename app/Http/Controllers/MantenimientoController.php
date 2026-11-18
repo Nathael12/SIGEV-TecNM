@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AlertaMantenimiento;
 use App\Models\Mantenimiento;
 use App\Models\Vehiculo;
 use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
@@ -14,7 +15,7 @@ class MantenimientoController extends Controller
     {
         $generadorAlertas->ejecutar();
         $consulta = Mantenimiento::with([
-            'vehiculo',
+            'vehiculo.ultimoMantenimiento',
             'alertas' => fn ($consulta) => $consulta->orderByDesc('id'),
         ])->orderByDesc('fecha_mantenimiento')->orderByDesc('id_mantenimiento');
 
@@ -23,6 +24,11 @@ class MantenimientoController extends Controller
         return view('admin.mantenimientos.index', [
             'mantenimientos' => $mantenimientos,
             'alertasMantenimiento' => ConsultaAlertasMantenimiento::obtener(),
+            'alertasFecha' => AlertaMantenimiento::with('mantenimiento.vehiculo')
+                ->where('estado', 'activa')
+                ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
+                ->orderBy('fecha_mantenimiento')
+                ->get(),
         ]);
     }
 

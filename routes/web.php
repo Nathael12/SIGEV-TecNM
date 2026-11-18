@@ -64,9 +64,9 @@ Route::get('/admin/vehiculos', [App\Http\Controllers\VehiculoController::class, 
 Route::get('/admin/vehiculos/create', [App\Http\Controllers\VehiculoController::class, 'create'])->name('admin.vehiculos.create')->middleware(['auth', 'can:ver formulario crear vehiculo']);
 Route::post('/admin/vehiculos', [App\Http\Controllers\VehiculoController::class, 'store'])->name('admin.vehiculos.store')->middleware(['auth', 'can:guardar vehiculo']);
 Route::get('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'show'])->name('admin.vehiculos.show')->middleware(['auth','can:ver detalle vehiculo']);
-Route::get('/admin/vehiculos/{id}/edit', [App\Http\Controllers\VehiculoController::class, 'edit'])->name('admin.vehiculos.edit')->middleware('auth');
-Route::put('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'update'])->name('admin.vehiculos.update')->middleware('auth');
-Route::delete('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'destroy'])->name('admin.vehiculos.destroy')->middleware('auth');
+Route::get('/admin/vehiculos/{id}/edit', [App\Http\Controllers\VehiculoController::class, 'edit'])->name('admin.vehiculos.edit')->middleware('auth','can:ver formulario editar vehiculo');
+Route::put('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'update'])->name('admin.vehiculos.update')->middleware('auth','can:actualizar vehiculo');
+Route::delete('/admin/vehiculos/{id}', [App\Http\Controllers\VehiculoController::class, 'destroy'])->name('admin.vehiculos.destroy')->middleware('auth','can:eliminar vehiculo');
 
 //rutas para mantenimientos
 Route::get('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'index'])->name('admin.mantenimientos.index')->middleware(['auth', 'can:ver mantenimientos']);

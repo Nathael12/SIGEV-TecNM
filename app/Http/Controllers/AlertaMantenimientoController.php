@@ -10,6 +10,6 @@ class AlertaMantenimientoController extends Controller
     {
         $alerta->update(['estado' => 'atendida', 'vista_en' => now()]);
 
-        return redirect()->route('admin.index')->with('mensaje', 'Alerta marcada como atendida.');
+        return redirect()->back()->with('mensaje', 'Alerta marcada como atendida.');
     }
 }

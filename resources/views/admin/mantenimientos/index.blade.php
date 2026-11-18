@@ -6,8 +6,11 @@
     @if (session('mensaje'))
         <div class="mb-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
     @endif
-    <div class="mb-6">
+    <div class="mb-6 space-y-3">
         <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
+        @can('ver alertas mantenimiento')
+            <x-alertas-fecha-mantenimiento :alertas="$alertasFecha" />
+        @endcan
     </div>
     <div class="flex justify-end">
         <a href="{{ route('admin.mantenimientos.create') }}" class="inline-flex items-center rounded bg-blue-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-600"><i class="fas fa-plus mr-2"></i> Registrar mantenimiento</a>
@@ -33,20 +36,32 @@
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">${{ number_format((float) $mantenimiento->monto_mantenimiento, 2) }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha->format('d/m/Y') }} · {{ number_format($mantenimiento->proximo_mantenimiento_km) }} km</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
-                            @if ($mantenimiento->alertas->isNotEmpty())
-                                @php($alerta = $mantenimiento->alertas->first())
-                                @php($diasRestantes = (int) now()->startOfDay()->diffInDays($alerta->fecha_mantenimiento, false))
-                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $alerta->estado === 'atendida' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200' : ($alerta->tipo === 'vencida' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200') }}">
-                                    @if ($alerta->estado === 'atendida')
-                                        Atendida
-                                    @elseif ($diasRestantes < 0)
-                                        Venció hace {{ abs($diasRestantes) }} {{ abs($diasRestantes) === 1 ? 'día' : 'días' }}
-                                    @elseif ($diasRestantes === 0)
-                                        Vence hoy
-                                    @else
-                                        Faltan {{ $diasRestantes }} {{ $diasRestantes === 1 ? 'día' : 'días' }}
+                            @php($evaluacionKm = $mantenimiento->vehiculo->ultimoMantenimiento?->is($mantenimiento) ? \App\Support\AlertasMantenimiento::evaluarKilometraje((float) $mantenimiento->vehiculo->{'kilometraje actual'}, (int) $mantenimiento->proximo_mantenimiento_km) : null)
+                            @php($alertaFecha = $mantenimiento->alertas->firstWhere('estado', 'activa'))
+                            @if ($evaluacionKm || $alertaFecha)
+                                <div class="flex flex-col items-center gap-1">
+                                    @if ($evaluacionKm)
+                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $evaluacionKm['condicion'] === 'Vencido' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200' }}">
+                                            @if ($evaluacionKm['condicion'] === 'Vencido')
+                                                Km: vencido · {{ number_format(abs($evaluacionKm['kilometros_restantes'])) }} km
+                                            @else
+                                                Km: faltan {{ number_format($evaluacionKm['kilometros_restantes']) }} km
+                                            @endif
+                                        </span>
                                     @endif
-                                </span>
+                                    @if ($alertaFecha)
+                                        @php($diasFecha = (int) now()->startOfDay()->diffInDays($alertaFecha->fecha_mantenimiento, false))
+                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $diasFecha < 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200' }}">
+                                            @if ($diasFecha < 0)
+                                                Fecha: vencido hace {{ abs($diasFecha) }} {{ abs($diasFecha) === 1 ? 'día' : 'días' }}
+                                            @elseif ($diasFecha === 0)
+                                                Fecha: corresponde hoy
+                                            @else
+                                                Fecha: faltan {{ $diasFecha }} {{ $diasFecha === 1 ? 'día' : 'días' }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                </div>
                             @else
                                 <span class="text-gray-400">—</span>
                             @endif

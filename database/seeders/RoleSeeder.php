@@ -56,6 +56,9 @@ class RoleSeeder extends Seeder
             'ver formulario crear vehiculo',
             'guardar vehiculo',
             'ver detalle vehiculo',
+            'ver formulario editar vehiculo',
+            'actualizar vehiculo',
+            'eliminar vehiculo',
 
             // Mantenimiento
             'ver mantenimientos',
@@ -96,19 +99,57 @@ class RoleSeeder extends Seeder
         // Encargado Flotilla: dashboard, vehículos y documentos
         // (puede consultar, registrar y descargar documentos; no editarlos ni eliminarlos)
         $encargado->syncPermissions([
-            'ver dashboard',
-
+             'ver dashboard',
+             
+            //vehiculos
             'ver vehiculos',
             'ver formulario crear vehiculo',
             'guardar vehiculo',
             'ver detalle vehiculo',
+            'ver formulario editar vehiculo',
+            'actualizar vehiculo',
+            'eliminar vehiculo',
 
+            //mantenimiento
             'ver mantenimientos',
             'ver alertas mantenimiento',
             'atender alertas mantenimiento',
             'ver formulario crear mantenimiento',
             'guardar mantenimiento',
 
+            //documentacion
+            'ver documentos',
+            'ver formulario crear documento',
+            'guardar documento',
+            'ver detalle documento',
+            'descargar documento',
+
+            // Asignaciones
+            'ver asignaciones',
+            'ver formulario crear asignacion',
+            'guardar asignacion',
+            'ver detalle asignacion',
+            'ver formulario devolucion',
+            'registrar devolucion',
+        ]);
+
+        //permisos de Solicitantes
+         $solicitante->syncPermissions([
+            'ver dashboard',
+            //vehiculos
+            'ver vehiculos',
+            'ver formulario crear vehiculo',
+            'guardar vehiculo',
+            'ver detalle vehiculo',
+        
+            //mantenimiento
+            'ver mantenimientos',
+            'ver alertas mantenimiento',
+            'atender alertas mantenimiento',
+            'ver formulario crear mantenimiento',
+            'guardar mantenimiento',
+
+            //documentacion
             'ver documentos',
             'ver formulario crear documento',
             'guardar documento',
