@@ -23,6 +23,7 @@
                 <flux:tooltip content="Search" position="bottom">
                     <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" label="Search" />
                 </flux:tooltip>
+                {{-- Enlaces externos retirados de la interfaz.
                 <flux:tooltip content="Repository" position="bottom">
                     <flux:navbar.item
                         class="h-10 max-lg:hidden [&>div>svg]:size-5"
@@ -41,6 +42,7 @@
                         label="Documentation"
                     />
                 </flux:tooltip>
+                --}}
             </flux:navbar>
 
             <!-- Desktop User Menu -->
@@ -106,6 +108,7 @@
 
             <flux:spacer />
 
+            {{-- Enlaces externos retirados de la interfaz.
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                     Repository
@@ -115,6 +118,7 @@
                     Documentation
                 </flux:navlist.item>
             </flux:navlist>
+            --}}
         </flux:sidebar>
 
         {{ $slot }}

@@ -84,3 +84,19 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+/* Login: Flux aplica dark:bg-white/10 cuando la apariencia oscura esta activa.
+   El navegador tambien puede imponer un fondo propio a los campos autocompletados. */
+[data-sigev-login] input[data-flux-control] {
+    background-color: #FFFFFF !important;
+    color: #1E293B;
+}
+
+[data-sigev-login] input[data-flux-control]:-webkit-autofill,
+[data-sigev-login] input[data-flux-control]:-webkit-autofill:hover,
+[data-sigev-login] input[data-flux-control]:-webkit-autofill:focus,
+[data-sigev-login] input[data-flux-control]:autofill {
+    -webkit-text-fill-color: #1E293B;
+    caret-color: #1E293B;
+    -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
+    box-shadow: 0 0 0 1000px #FFFFFF inset;
+}

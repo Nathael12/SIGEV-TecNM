@@ -48,7 +48,7 @@
                     <div>
                         <flux:label>Nombre de usuario <span class="text-red-500" title="Campo obligatorio">(*)</span></flux:label>
                         <flux:input name="name" value="{{ old('name') }}" icon="user" placeholder="Ej. jorge_11" autocomplete="off" maxlength="20" pattern="[a-zA-Z][a-zA-Z0-9_]{3,19}" x-ref="nombreUsuario" x-on:keydown.enter.prevent x-on:input="$el.value = $el.value.replace(/[^a-zA-Z0-9_]/g, '').replace(/^[0-9_]+/, '').slice(0, 20)" required />
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400">4 a 20 caracteres: letras, números y guion bajo; comienza con una letra. <span x-text="$refs.nombreUsuario.value.length + '/20'">0/20</span></p>
+                        <p class="text-xs text-zinc-500 dark:text-zinc-400">letras, números y guion bajo</p>
                         <flux:error name="name" />
                     </div>
 

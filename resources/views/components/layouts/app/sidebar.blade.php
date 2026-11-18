@@ -71,6 +71,7 @@
 
             <flux:spacer />
 
+            {{-- Enlaces externos retirados de la interfaz.
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                     Repository
@@ -80,6 +81,7 @@
                     Documentation
                 </flux:navlist.item>
             </flux:navlist>
+            --}}
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">

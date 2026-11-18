@@ -8,13 +8,13 @@
         <form action="{{ route('admin.vehiculos.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div><flux:label>Número económico <span class="text-red-500">(*)</span></flux:label><flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required /><flux:error name="numero_economico" /></div>
-                <div><flux:label>Placas <span class="text-red-500">(*)</span></flux:label><flux:input name="placas" value="{{ old('placas') }}" icon="identification" required /><flux:error name="placas" /></div>
-                <div><flux:label>Marca <span class="text-red-500">(*)</span></flux:label><flux:input name="marca" value="{{ old('marca') }}" icon="truck" required /><flux:error name="marca" /></div>
-                <div><flux:label>Modelo <span class="text-red-500">(*)</span></flux:label><flux:input name="modelo" value="{{ old('modelo') }}" icon="truck" required /><flux:error name="modelo" /></div>
+                <div><flux:label>Número económico <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required /> --><flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required placeholder="Ej. VEH-001" /><flux:error name="numero_economico" /></div>
+                <div><flux:label>Placas <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="placas" value="{{ old('placas') }}" icon="identification" required /> --><flux:input name="placas" value="{{ old('placas') }}" icon="identification" required placeholder="Ej. ABC-123-D" /><flux:error name="placas" /></div>
+                <div><flux:label>Marca <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="marca" value="{{ old('marca') }}" icon="truck" required /> --><flux:input name="marca" value="{{ old('marca') }}" icon="truck" required placeholder="Ej. Toyota" /><flux:error name="marca" /></div>
+                <div><flux:label>Modelo <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="modelo" value="{{ old('modelo') }}" icon="truck" required /> --><flux:input name="modelo" value="{{ old('modelo') }}" icon="truck" required placeholder="Ej. Hilux" /><flux:error name="modelo" /></div>
                 <div><flux:label>Año <span class="text-red-500">(*)</span></flux:label><flux:input name="anio" type="number" min="1901" max="{{ now()->year + 1 }}" value="{{ old('anio') }}" required /><flux:error name="anio" /></div>
-                <div><flux:label>Tipo de vehículo <span class="text-red-500">(*)</span></flux:label><flux:input name="tipo" value="{{ old('tipo') }}" icon="squares-2x2" required /><flux:error name="tipo" /></div>
-                <div><flux:label>Color <span class="text-red-500">(*)</span></flux:label><flux:input name="color" value="{{ old('color') }}" icon="swatch" required /><flux:error name="color" /></div>
+                <div><flux:label>Tipo de vehículo <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="tipo" value="{{ old('tipo') }}" icon="squares-2x2" required /> --><flux:input name="tipo" value="{{ old('tipo') }}" icon="squares-2x2" required placeholder="Ej. Pickup" /><flux:error name="tipo" /></div>
+                <div><flux:label>Color <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="color" value="{{ old('color') }}" icon="swatch" required /> --><flux:input name="color" value="{{ old('color') }}" icon="swatch" required placeholder="Ej. Blanco" /><flux:error name="color" /></div>
                 <div>
                     <flux:label>Tipo de combustible <span class="text-red-500">(*)</span></flux:label>
                     <flux:select name="combustible" required>
@@ -25,8 +25,8 @@
                     </flux:select>
                     <flux:error name="combustible" />
                 </div>
-                <div><flux:label>Kilometraje actual <span class="text-red-500">(*)</span></flux:label><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje') }}" required /><flux:error name="kilometraje" /></div>
-                <div><flux:label>Fecha de adquisición <span class="text-red-500">(*)</span></flux:label><flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion') }}" required /><flux:error name="fecha_adquisicion" /></div>
+                <div><flux:label>Kilometraje actual <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje') }}" required /> --><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje') }}" required placeholder="Ej. 85000" /><flux:error name="kilometraje" /></div>
+                <div><flux:label>Fecha de adquisición <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion') }}" required /> --><flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion') }}" required placeholder="AAAA-MM-DD" /><flux:error name="fecha_adquisicion" /></div>
                 <div>
                     <flux:label>Estado <span class="text-red-500">(*)</span></flux:label>
                     <flux:select name="estado" required>
