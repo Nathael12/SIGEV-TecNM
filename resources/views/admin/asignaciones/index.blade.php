@@ -204,11 +204,10 @@
     @if (session('mensaje'))
         <script>
             Swal.fire({
-                position: 'top-end',
                 icon: @json(session('icono', 'success')),
                 title: @json(session('mensaje')),
                 showConfirmButton: false,
-                timer: 4000
+                timer: 3000
             });
         </script>
     @endif

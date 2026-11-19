@@ -19,6 +19,20 @@ class AsignacionController extends Controller
     private const COL_KM = 'kilometraje actual';
 
     /**
+     * Días máximos de anticipación para programar una salida (la institución
+     * permite asignar con hasta 3 semanas de antelación).
+     */
+    private const DIAS_ANTICIPACION = 21;
+
+    /**
+     * Fecha límite hacia adelante para la salida (ahora + días de anticipación).
+     */
+    private function limiteSalida(): string
+    {
+        return now()->addDays(self::DIAS_ANTICIPACION)->format('Y-m-d H:i:s');
+    }
+
+    /**
      * Solo se pueden asignar vehículos en estado Disponible (RN-03).
      */
     private function vehiculosDisponibles()
@@ -111,7 +125,7 @@ class AsignacionController extends Controller
         $request->validate([
             'vehiculo_id'         => 'required|integer|exists:vehiculos,id_vehiculo',
             'usuario_id'          => 'required|integer|exists:users,id',
-            'fecha_salida'        => 'required|date|before_or_equal:now',
+            'fecha_salida'        => 'required|date|before_or_equal:' . $this->limiteSalida(),
             'motivo_uso'          => 'required|string|max:255',
             'destino_vehiculo'    => 'required|string|max:255',
             'kilometraje_inicial' => 'required|integer|min:0',
@@ -121,7 +135,7 @@ class AsignacionController extends Controller
             'date'                        => 'Escribe una fecha y hora válidas.',
             'min'                         => 'El valor mínimo es :min.',
             'max'                         => 'Máximo :max caracteres.',
-            'fecha_salida.before_or_equal' => 'La fecha de salida no puede ser futura.',
+            'fecha_salida.before_or_equal' => 'No se puede programar una salida con más de ' . self::DIAS_ANTICIPACION . ' días de anticipación.',
             'vehiculo_id.exists'          => 'El vehículo seleccionado no existe.',
             'usuario_id.exists'           => 'El solicitante seleccionado no existe.',
         ]);
@@ -229,7 +243,7 @@ class AsignacionController extends Controller
 
         $reglas = [
             'usuario_id'       => 'required|integer|exists:users,id',
-            'fecha_salida'     => 'required|date|before_or_equal:now',
+            'fecha_salida'     => 'required|date|before_or_equal:' . $this->limiteSalida(),
             'motivo_uso'       => 'required|string|max:255',
             'destino_vehiculo' => 'required|string|max:255',
         ];
@@ -246,7 +260,7 @@ class AsignacionController extends Controller
             'date'                          => 'Escribe una fecha y hora válidas.',
             'max'                           => 'Máximo :max caracteres.',
             'usuario_id.exists'             => 'El solicitante seleccionado no existe.',
-            'fecha_salida.before_or_equal'  => 'La fecha de salida no puede ser futura.',
+            'fecha_salida.before_or_equal'  => 'No se puede programar una salida con más de ' . self::DIAS_ANTICIPACION . ' días de anticipación.',
             'fecha_regreso.before_or_equal' => 'La fecha de regreso no puede ser futura.',
             'fecha_regreso.after_or_equal'  => 'La fecha de regreso no puede ser anterior a la de salida.',
             'kilometraje_final.min'         => 'No puede ser menor al kilometraje inicial ('
