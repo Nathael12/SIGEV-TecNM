@@ -24,6 +24,12 @@ class AsignacionController extends Controller
     private function vehiculosDisponibles()
     {
         return Vehiculo::where('estado', 'Disponible')
+            ->whereNotExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('asignacion_vehiculos')
+                    ->whereColumn('asignacion_vehiculos.vehiculo_id', 'vehiculos.id_vehiculo')
+                    ->whereNull('asignacion_vehiculos.fecha_regreso');
+            })
             ->orderBy('numero_economico')
             ->get();
     }

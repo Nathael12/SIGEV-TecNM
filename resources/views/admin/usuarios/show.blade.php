@@ -41,6 +41,13 @@
 
                 {{-- Fila 1 --}}
 
+                @if ($esAdministrador)
+                    <div>
+                        <flux:label>Nombre de usuario</flux:label>
+                        <flux:input icon="user" value="{{ $usuario->name }}" readonly />
+                    </div>
+                @endif
+
                 <div>
                     <flux:label>Nombre(s)</flux:label>
                     <flux:input icon="user" value="{{ $usuario->nombre_usuario }}" readonly />

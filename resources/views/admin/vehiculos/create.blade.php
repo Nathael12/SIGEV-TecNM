@@ -5,7 +5,7 @@
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <form action="{{ route('admin.vehiculos.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+        <form id="form-registro-vehiculo" action="{{ route('admin.vehiculos.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div><flux:label>Número económico <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required /> --><flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required placeholder="Ej. VEH-001" /><flux:error name="numero_economico" /></div>
@@ -27,15 +27,6 @@
                 </div>
                 <div><flux:label>Kilometraje actual <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje') }}" required /> --><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje') }}" required placeholder="Ej. 85000" /><flux:error name="kilometraje" /></div>
                 <div><flux:label>Fecha de adquisición <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion') }}" required /> --><flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion') }}" required placeholder="AAAA-MM-DD" /><flux:error name="fecha_adquisicion" /></div>
-                <div>
-                    <flux:label>Estado <span class="text-red-500">(*)</span></flux:label>
-                    <flux:select name="estado" required>
-                        @foreach ($estados as $estado)
-                            <flux:select.option value="{{ $estado }}" :selected="old('estado', 'Disponible') === $estado">{{ $estado }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    <flux:error name="estado" />
-                </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <flux:label>Fotografía del vehículo <span class="text-red-500">(*)</span></flux:label>
                     <div class="mt-2 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
@@ -60,7 +51,10 @@
             </div>
             <div class="flex justify-end gap-2 px-6 pb-6">
                 <a href="{{ route('admin.vehiculos.index') }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600">Cancelar</a>
-                <flux:button variant="primary" type="submit" color="blue">Guardar vehículo</flux:button>
+                <flux:button id="guardar-vehiculo" variant="primary" type="submit" color="blue">
+                    <span data-submit-label>Guardar vehículo</span>
+                    <span data-submit-spinner class="hidden"><flux:icon name="arrow-path" class="ml-2 size-4 animate-spin" /></span>
+                </flux:button>
             </div>
         </form>
     </div>
@@ -68,6 +62,27 @@
 
 <script>
     (() => {
+        const form = document.getElementById('form-registro-vehiculo');
+        const submitButton = document.getElementById('guardar-vehiculo');
+        const submitLabel = submitButton?.querySelector('[data-submit-label]');
+        const submitSpinner = submitButton?.querySelector('[data-submit-spinner]');
+        let enviando = false;
+
+        form?.addEventListener('submit', (event) => {
+            if (enviando) {
+                event.preventDefault();
+                return;
+            }
+
+            enviando = true;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.setAttribute('aria-busy', 'true');
+            }
+            if (submitLabel) submitLabel.textContent = 'Guardando...';
+            submitSpinner?.classList.remove('hidden');
+        });
+
         const input = document.getElementById('fotografia');
         const preview = document.getElementById('fotografia-preview');
         const placeholder = document.getElementById('fotografia-placeholder');
