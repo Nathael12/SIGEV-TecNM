@@ -34,14 +34,28 @@ class MantenimientoController extends Controller
 
     public function create()
     {
-        $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+        $vehiculos = Vehiculo::with('ultimaAsignacion')->orderBy('numero_economico')->get();
+        $kilometrajes = $vehiculos->mapWithKeys(
+            fn (Vehiculo $vehiculo) => [$vehiculo->getKey() => $vehiculo->kilometraje_vigente]
+        );
 
-        return view('admin.mantenimientos.create', compact('vehiculos'));
+        return view('admin.mantenimientos.create', compact('vehiculos', 'kilometrajes'));
     }
 
     public function store(Request $request)
     {
         $datos = $request->validate($this->reglas(), $this->mensajes());
+
+        $vehiculo = Vehiculo::with('ultimaAsignacion')->findOrFail($datos['vehiculo_id']);
+        $kilometraje = $vehiculo->kilometraje_vigente;
+
+        if ($kilometraje === null) {
+            return back()->withInput()->withErrors([
+                'vehiculo_id' => 'Kilometraje no disponible para el vehículo seleccionado.',
+            ]);
+        }
+
+        $datos['kilometraje_mantenimiento'] = $kilometraje;
 
         Mantenimiento::create($datos);
 
@@ -50,14 +64,33 @@ class MantenimientoController extends Controller
 
     public function edit(Mantenimiento $mantenimiento)
     {
-        $vehiculos = Vehiculo::orderBy('numero_economico')->get();
+        $vehiculos = Vehiculo::with('ultimaAsignacion')->orderBy('numero_economico')->get();
+        $kilometrajes = $vehiculos->mapWithKeys(
+            fn (Vehiculo $vehiculo) => [$vehiculo->getKey() => $vehiculo->kilometraje_vigente]
+        );
 
-        return view('admin.mantenimientos.edit', compact('mantenimiento', 'vehiculos'));
+        return view('admin.mantenimientos.edit', compact('mantenimiento', 'vehiculos', 'kilometrajes'));
     }
 
     public function update(Request $request, Mantenimiento $mantenimiento)
     {
-        $mantenimiento->update($request->validate($this->reglas(), $this->mensajes()));
+        $datos = $request->validate($this->reglas(), $this->mensajes());
+
+        // El kilometraje histórico se conserva si solo se editan datos del mismo vehículo.
+        if ((int) $datos['vehiculo_id'] !== (int) $mantenimiento->vehiculo_id) {
+            $vehiculo = Vehiculo::with('ultimaAsignacion')->findOrFail($datos['vehiculo_id']);
+            $kilometraje = $vehiculo->kilometraje_vigente;
+
+            if ($kilometraje === null) {
+                return back()->withInput()->withErrors([
+                    'vehiculo_id' => 'Kilometraje no disponible para el vehículo seleccionado.',
+                ]);
+            }
+
+            $datos['kilometraje_mantenimiento'] = $kilometraje;
+        }
+
+        $mantenimiento->update($datos);
 
         return redirect()->route('admin.mantenimientos.index')->with('mensaje', 'Mantenimiento actualizado correctamente');
     }
@@ -74,7 +107,6 @@ class MantenimientoController extends Controller
         return [
             'vehiculo_id' => ['required', 'integer', 'exists:vehiculos,id_vehiculo'],
             'fecha_mantenimiento' => ['required', 'date'],
-            'kilometraje_mantenimiento' => ['required', 'integer', 'min:0'],
             'categoria_mantenimiento' => ['required', 'string', 'max:45'],
             'descripcion_mantenimiento' => ['required', 'string', 'max:255'],
             'monto_mantenimiento' => ['required', 'numeric', 'min:0', 'max:99999999.99'],

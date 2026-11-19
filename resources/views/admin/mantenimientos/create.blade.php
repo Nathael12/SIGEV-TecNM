@@ -19,7 +19,7 @@
                     <flux:error name="vehiculo_id" />
                 </div>
                 <div><flux:label>Fecha del mantenimiento <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="fecha_mantenimiento" type="date" value="{{ old('fecha_mantenimiento') }}" required /> --><flux:input name="fecha_mantenimiento" type="date" value="{{ old('fecha_mantenimiento') }}" required placeholder="AAAA-MM-DD" /><flux:error name="fecha_mantenimiento" /></div>
-                <div><flux:label>Kilometraje del vehículo <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="kilometraje_mantenimiento" type="number" min="0" step="1" value="{{ old('kilometraje_mantenimiento') }}" required /> --><flux:input name="kilometraje_mantenimiento" type="number" min="0" step="1" value="{{ old('kilometraje_mantenimiento') }}" required placeholder="Ej. 85000" /><flux:error name="kilometraje_mantenimiento" /></div>
+                <div><flux:label>Kilometraje del vehículo</flux:label><flux:input id="kilometraje-mantenimiento" type="text" readonly placeholder="Selecciona un vehículo" /></div>
                 <div><flux:label>Categoría <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="categoria_mantenimiento" maxlength="45" value="{{ old('categoria_mantenimiento') }}" required /> --><flux:input name="categoria_mantenimiento" maxlength="45" value="{{ old('categoria_mantenimiento') }}" required placeholder="Ej. Preventivo" /><flux:error name="categoria_mantenimiento" /></div>
                 <div class="sm:col-span-2 lg:col-span-3"><flux:label>Descripción del servicio <span class="text-red-500">(*)</span></flux:label><!-- <flux:textarea name="descripcion_mantenimiento" maxlength="255" required>{{ old('descripcion_mantenimiento') }}</flux:textarea> --><flux:textarea name="descripcion_mantenimiento" maxlength="255" required placeholder="Ej. Cambio de aceite y revision de filtros">{{ old('descripcion_mantenimiento') }}</flux:textarea><flux:error name="descripcion_mantenimiento" /></div>
                 <div><flux:label>Monto <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="monto_mantenimiento" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('monto_mantenimiento') }}" required /> --><flux:input name="monto_mantenimiento" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('monto_mantenimiento') }}" required placeholder="Ej. 1500.00" /><flux:error name="monto_mantenimiento" /></div>
@@ -33,22 +33,36 @@
         </form>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const kilometrajes = @json($vehiculos->mapWithKeys(fn ($vehiculo) => [$vehiculo->getKey() => (int) round((float) $vehiculo->{'kilometraje actual'})]));
+        (() => {
+        const inicializarKilometraje = () => {
+            const kilometrajes = @json($kilometrajes);
             const vehiculoSelect = document.querySelector('select[name="vehiculo_id"]');
-            const kilometrajeInput = document.querySelector('input[name="kilometraje_mantenimiento"]');
+            const kilometrajeInput = document.getElementById('kilometraje-mantenimiento');
 
             if (!vehiculoSelect || !kilometrajeInput) return;
 
-            const actualizarKilometraje = (sobrescribir = true) => {
+            const actualizarKilometraje = () => {
                 const kilometraje = kilometrajes[vehiculoSelect.value];
-                if (kilometraje !== undefined && (sobrescribir || kilometrajeInput.value === '')) {
-                    kilometrajeInput.value = kilometraje;
-                }
+                kilometrajeInput.value = !vehiculoSelect.value
+                    ? ''
+                    : (kilometraje === null || kilometraje === undefined
+                        ? 'Kilometraje no disponible'
+                        : `${new Intl.NumberFormat('es-MX').format(kilometraje)} km`);
             };
 
-            vehiculoSelect.addEventListener('change', () => actualizarKilometraje());
-            actualizarKilometraje(false);
-        });
+            if (vehiculoSelect.dataset.kilometrajeBound !== 'true') {
+                vehiculoSelect.addEventListener('change', actualizarKilometraje);
+                vehiculoSelect.dataset.kilometrajeBound = 'true';
+            }
+            actualizarKilometraje();
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializarKilometraje, { once: true });
+        } else {
+            inicializarKilometraje();
+        }
+        document.addEventListener('livewire:navigated', inicializarKilometraje);
+        })();
     </script>
 </x-layouts.app>

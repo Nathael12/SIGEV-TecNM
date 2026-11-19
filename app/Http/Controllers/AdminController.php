@@ -22,14 +22,14 @@ class AdminController extends Controller
             ->groupBy('estado')
             ->pluck('total', 'estado');
 
-        $hoy = Carbon::today();
-        $diasAlerta = (int) config('maintenance.days_alert', 20);
         $totalVehiculos = (int) $conteosPorEstado->sum();
         $mantenimientosPendientes = Mantenimiento::where('estado_mantenimiento', 'pendiente')->count();
-        $mantenimientosProximos = Mantenimiento::where('estado_mantenimiento', 'pendiente')
-            ->whereNotNull('proximo_mantenimiento_fecha')
-            ->whereBetween('proximo_mantenimiento_fecha', [$hoy, $hoy->copy()->addDays($diasAlerta)])
-            ->count();
+        $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
+            ->where('estado', 'activa')
+            ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
+            ->orderBy('fecha_mantenimiento')
+            ->get();
+        $mantenimientosProximos = $alertasMantenimiento->where('tipo', 'proxima')->count();
 
         $indicadoresVehiculos = [
             ['titulo' => 'Total de vehículos', 'cantidad' => $totalVehiculos, 'icono' => 'truck', 'color' => 'blue'],
@@ -45,12 +45,6 @@ class AdminController extends Controller
             ->map(fn ($estado) => ['estado' => $estado, 'total' => (int) $conteosPorEstado->get($estado, 0)]);
         $vehiculos = Vehiculo::with('ultimoMantenimiento')->orderBy('numero_economico')->get();
         $alertasKilometraje = ConsultaAlertasMantenimiento::obtener();
-        $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
-            ->where('estado', 'activa')
-            ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
-            ->orderBy('fecha_mantenimiento')
-            ->get();
-
         return view('admin.index', [
             'dashboardDate' => Carbon::now()->locale('es')->translatedFormat('l, d \\d\\e F \\d\\e Y'),
             'rolUsuario' => $rolUsuario,

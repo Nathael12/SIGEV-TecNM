@@ -140,13 +140,13 @@
             @if ($documento->ruta_archivo)
                 <div style="margin-top: 32px;">
                     <flux:heading size="lg" level="2">Vista previa del archivo</flux:heading>
-                    <div style="margin-top:12px;">
+                    <div style="width:100%;max-width:900px;margin:12px auto 0;">
                         @if ($esImagen)
                             <img src="{{ $urlArchivo }}" alt="{{ $documento->descripcion_documento }}"
-                                style="max-width:100%;max-height:600px;border-radius:8px;border:1px solid #94a3b8;">
+                                style="display:block;max-width:100%;max-height:480px;object-fit:contain;margin:0 auto;border-radius:8px;border:1px solid #94a3b8;">
                         @else
                             <iframe src="{{ $urlArchivo }}" title="{{ $documento->descripcion_documento }}"
-                                style="width:100%;height:600px;border:1px solid #94a3b8;border-radius:8px;"></iframe>
+                                style="display:block;width:100%;height:clamp(280px,60vh,520px);border:1px solid #94a3b8;border-radius:8px;"></iframe>
                         @endif
                     </div>
                 </div>
