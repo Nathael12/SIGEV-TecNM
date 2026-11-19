@@ -80,8 +80,29 @@ class UsuarioController extends Controller
      */
     public function show(string $id)
     {
-        $usuario = User::with('roles')->findOrFail($id);
-        return view('admin.usuarios.show', compact('usuario'));
+        $esAdministrador = Auth::user()->hasRole('Administrador');
+        $columnas = [
+            'id',
+            'nombre_usuario',
+            'apellido_paterno',
+            'apellido_materno',
+            'telefono_usuario',
+            'correo_usuario',
+            'estado',
+            'created_at',
+            'updated_at',
+        ];
+
+        if ($esAdministrador) {
+            $columnas[] = 'name';
+        }
+
+        $usuario = User::query()
+            ->select($columnas)
+            ->with('roles')
+            ->findOrFail($id);
+
+        return view('admin.usuarios.show', compact('usuario', 'esAdministrador'));
     }
 
     /**

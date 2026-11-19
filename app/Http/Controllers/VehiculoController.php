@@ -3,30 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehiculo;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class VehiculoController extends Controller
 {
-    private const ESTADOS = [
-        'Disponible',
-        'Asignado',
-        'En mantenimiento',
-        'Fuera de servicio',
-        'Baja',
-    ];
-
-    public function index()
+    public function index(Request $request)
     {
-        $vehiculos = Vehiculo::orderBy('numero_economico')->get();
-        return view('admin.vehiculos.index', compact('vehiculos'));
+        $columnasOrdenables = [
+            'marca' => 'marca',
+            'modelo' => 'modelo',
+            'anio' => 'anio',
+            'estado' => 'estado',
+        ];
+        $orden = $request->query('orden');
+        $direccion = $request->query('direccion');
+
+        if (! isset($columnasOrdenables[$orden]) || ! in_array($direccion, ['asc', 'desc'], true)) {
+            $orden = 'created_at';
+            $direccion = 'desc';
+        }
+
+        $vehiculos = Vehiculo::query()
+            ->orderBy($columnasOrdenables[$orden] ?? $orden, $direccion)
+            ->orderBy('id_vehiculo', $direccion)
+            ->paginate(15)
+            ->withQueryString();
+
+        $ordenActual = $orden;
+        $direccionActual = $direccion;
+
+        return view('admin.vehiculos.index', compact('vehiculos', 'ordenActual', 'direccionActual'));
     }
 
     public function create()
     {
-        $estados = self::ESTADOS;
-        return view('admin.vehiculos.create', compact('estados'));
+        return view('admin.vehiculos.create');
     }
 
     public function store(Request $request)
@@ -49,7 +65,6 @@ class VehiculoController extends Controller
             'combustible' => ['required', 'string', 'max:255'],
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
-            'estado' => ['required', Rule::in(self::ESTADOS)],
             'fotografia' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
             'numero_economico.unique' => 'Este número económico ya está registrado.',
@@ -62,8 +77,28 @@ class VehiculoController extends Controller
         }
 
         $datos = $this->mapearColumnasVehiculo($datos);
+        // Los vehiculos nuevos siempre ingresan a la flotilla disponibles.
+        // El estado no se acepta desde el formulario para evitar asignaciones manuales al registrar.
+        $datos['estado'] = 'Disponible';
         $datos['fotografia'] = $rutaFotografia;
-        $vehiculo = Vehiculo::create($datos);
+
+        try {
+            DB::transaction(fn () => Vehiculo::create($datos));
+        } catch (UniqueConstraintViolationException $exception) {
+            Storage::disk('public')->delete($rutaFotografia);
+
+            return back()->withInput()->withErrors([
+                'numero_economico' => 'El número económico o las placas ya están registrados. Verifica los datos e inténtalo de nuevo.',
+            ]);
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($rutaFotografia);
+            report($exception);
+
+            return back()->withInput()->withErrors([
+                'fotografia' => 'No se pudo registrar el vehículo. Revisa los datos e inténtalo de nuevo.',
+            ]);
+        }
+
         return redirect()->route('admin.vehiculos.index')
             ->with('mensaje', 'Vehículo registrado correctamente');
     }
@@ -80,8 +115,7 @@ class VehiculoController extends Controller
     {
         $vehiculo = Vehiculo::findOrFail($id);
         $fotografiaUrl = $vehiculo->fotografia_url;
-        $estados = self::ESTADOS;
-        return view('admin.vehiculos.edit', compact('vehiculo', 'estados', 'fotografiaUrl'));
+        return view('admin.vehiculos.edit', compact('vehiculo', 'fotografiaUrl'));
     }
 
     public function update(Request $request, string $id)
@@ -104,13 +138,14 @@ class VehiculoController extends Controller
             'combustible' => ['required', 'string', 'max:255'],
             'kilometraje' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'fecha_adquisicion' => ['required', 'date'],
-            'estado' => ['required', Rule::in(self::ESTADOS)],
             'fotografia' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ], [
             'numero_economico.unique' => 'Este número económico ya está registrado por otro vehículo.',
             'placas.unique' => 'Estas placas ya están registradas por otro vehículo.',
         ]);
 
+        // El estado se administra desde los flujos de asignación y devolución, no desde la edición general.
+        unset($datos['estado']);
         unset($datos['fotografia']);
         $datos = $this->mapearColumnasVehiculo($datos);
         $fotografiaAnterior = $vehiculo->fotografia;

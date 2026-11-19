@@ -33,13 +33,8 @@
                 <div><flux:label>Kilometraje actual <span class="text-red-500">(*)</span></flux:label><flux:input name="kilometraje" type="number" min="0" max="99999999.99" step="0.01" value="{{ old('kilometraje', $vehiculo->{'kilometraje actual'}) }}" required /><flux:error name="kilometraje" /></div>
                 <div><flux:label>Fecha de adquisición <span class="text-red-500">(*)</span></flux:label><flux:input name="fecha_adquisicion" type="date" value="{{ old('fecha_adquisicion', $vehiculo->fecha_adquisicion->format('Y-m-d')) }}" required /><flux:error name="fecha_adquisicion" /></div>
                 <div>
-                    <flux:label>Estado <span class="text-red-500">(*)</span></flux:label>
-                    <flux:select name="estado" required>
-                        @foreach ($estados as $estado)
-                            <flux:select.option value="{{ $estado }}" :selected="old('estado', $vehiculo->estado) === $estado">{{ $estado }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                    <flux:error name="estado" />
+                    <flux:label>Estado actual</flux:label>
+                    <flux:input value="{{ $vehiculo->estado }}" readonly />
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <flux:label>Fotografía del vehículo</flux:label>

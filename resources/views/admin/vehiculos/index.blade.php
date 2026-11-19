@@ -13,15 +13,25 @@
         <table class="w-full min-w-[900px] border-collapse">
             <thead class="bg-gray-50 text-center dark:bg-zinc-900">
                 <tr>
-                    @foreach (['Nro.', 'Número económico', 'Placas', 'Marca', 'Modelo', 'Año', 'Estado', 'Acciones'] as $encabezado)
-                        <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">{{ $encabezado }}</th>
+                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Nro.</th>
+                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Número económico</th>
+                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Placas</th>
+                    @foreach (['marca' => 'Marca', 'modelo' => 'Modelo', 'anio' => 'Año', 'estado' => 'Estado'] as $columna => $etiqueta)
+                        @php($direccionSiguiente = $ordenActual === $columna && $direccionActual === 'asc' ? 'desc' : 'asc')
+                        <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">
+                            <a href="{{ route('admin.vehiculos.index', ['orden' => $columna, 'direccion' => $direccionSiguiente]) }}" class="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Ordenar por {{ $etiqueta }} {{ $direccionSiguiente === 'asc' ? 'ascendente' : 'descendente' }}">
+                                {{ $etiqueta }}
+                                <span class="text-[10px]" aria-hidden="true">{{ $ordenActual === $columna ? ($direccionActual === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                            </a>
+                        </th>
                     @endforeach
+                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($vehiculos as $vehiculo)
                     <tr class="text-center transition hover:bg-gray-50 dark:hover:bg-zinc-700/50">
-                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $loop->iteration }}</td>
+                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $vehiculos->firstItem() + $loop->index }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $vehiculo->numero_economico }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $vehiculo->placas }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $vehiculo->marca }}</td>
@@ -57,5 +67,8 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="mt-4">
+        {{ $vehiculos->links() }}
     </div>
 </x-layouts.app>
