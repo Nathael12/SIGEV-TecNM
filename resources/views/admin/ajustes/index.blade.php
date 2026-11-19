@@ -13,24 +13,14 @@
             <div class="p-5 sm:p-6">
 
                 <div class="grid grid-cols-1 items-start gap-x-6 gap-y-5 sm:grid-cols-2">
-
-                    <div class="min-w-0">
+                    <div class="flex min-w-0 flex-col gap-y-5">
+                        <div class="min-w-0">
                         <flux:label>Nombre de la empresa<span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
                         <flux:input name="nombre" icon="building-office" placeholder="Nombre Comercial" :value="old('nombre', $ajuste->nombre)" maxlength="255" class="w-full min-w-0" required />
                         <flux:error name="nombre" />
                     </div>
 
-                    <div class="min-w-0">
-                        <flux:label>Descripción</flux:label>
-                        <div class="relative min-w-0">
-                            <flux:icon name="document-text" class="pointer-events-none absolute left-3 top-3 h-5 w-5 text-zinc-400 dark:text-zinc-500" />
-                            <flux:textarea name="descripcion" rows="4" maxlength="255"
-                                placeholder="Breve reseña de la empresa..." resize="none" class="w-full min-w-0 ps-10 [overflow-wrap:anywhere]">{{ old('descripcion', $ajuste->descripcion) }}</flux:textarea>
-                        </div>
-                        <flux:error name="descripcion" />
-                    </div>
-
-                    <div class="min-w-0">
+                        <div class="min-w-0">
                         <flux:label>Dirección <span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
                         <div class="relative min-w-0">
                             <flux:icon name="map-pin" class="pointer-events-none absolute left-3 top-3 h-5 w-5 text-zinc-400 dark:text-zinc-500" />
@@ -40,20 +30,36 @@
                         <flux:error name="direccion" />
                     </div>
 
-                    <div class="min-w-0">
-                        <flux:label>Teléfono <span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
-                        <flux:input name="telefono" icon="phone" placeholder="+00 000 000" :value="old('telefono', $ajuste->telefono)" maxlength="20" class="w-full min-w-0" required />
-                        <flux:error name="telefono" />
-                    </div>
-
-                    <div class="min-w-0">
+                        <div class="min-w-0">
                         <flux:label>Email de Contacto <span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
                         <flux:input name="email" type="email" icon="envelope" placeholder="Email de contacto" :value="old('email', $ajuste->email)" maxlength="255" class="w-full min-w-0" required />
                         <flux:error name="email" />
                     </div>
 
+                        <div class="min-w-0">
+                        <flux:label>Sitio Web</flux:label>
+                        <flux:input name="web" icon="globe-alt" placeholder="www.empresa.com" :value="old('web', $ajuste->web)" maxlength="255" class="w-full min-w-0" />
+                        <flux:error name="web" />
+                    </div>
+                    </div>
+                    <div class="flex min-w-0 flex-col gap-y-5">
+                        <div class="min-w-0">
+                        <flux:label>Descripción</flux:label>
+                        <div class="relative min-w-0">
+                            <flux:icon name="document-text" class="pointer-events-none absolute left-3 top-3 h-5 w-5 text-zinc-400 dark:text-zinc-500" />
+                            <flux:textarea name="descripcion" rows="4" maxlength="255"
+                                placeholder="Breve reseña de la empresa..." resize="none" class="w-full min-w-0 ps-10 [overflow-wrap:anywhere]">{{ old('descripcion', $ajuste->descripcion) }}</flux:textarea>
+                        </div>
+                        <flux:error name="descripcion" />
+                    </div>
 
-                    <div class="min-w-0">
+                        <div class="min-w-0">
+                        <flux:label>Teléfono <span class="ml-1 text-red-500" title="Campo obligatorio">*</span></flux:label>
+                        <flux:input name="telefono" icon="phone" placeholder="+00 000 000" :value="old('telefono', $ajuste->telefono)" maxlength="20" class="w-full min-w-0" required />
+                        <flux:error name="telefono" />
+                    </div>
+
+                        <div class="min-w-0">
                         <flux:label>Logo Institucional</flux:label>
 
                         <div class="flex items-center gap-6">
@@ -84,13 +90,7 @@
 
                         <flux:error name="logo" />
                     </div>
-
-                    <div class="min-w-0">
-                        <flux:label>Sitio Web</flux:label>
-                        <flux:input name="web" icon="globe-alt" placeholder="www.empresa.com" :value="old('web', $ajuste->web)" maxlength="255" class="w-full min-w-0" />
-                        <flux:error name="web" />
                     </div>
-
                 </div>
 
             </div>

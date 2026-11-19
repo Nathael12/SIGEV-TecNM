@@ -12,7 +12,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth.login')] class extends Component {
     #[Validate('required|string')]
     public string $email = '';
 
@@ -114,38 +114,34 @@ new #[Layout('components.layouts.auth')] class extends Component {
     -->
 </div>
 --}}
-<div class="flex w-full flex-col gap-8 text-slate-700 [&_[data-flux-error]]:text-red-700">
-    <div class="space-y-2">
-        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-blue-900">Acceso al sistema</p>
-        <h1 class="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Bienvenido a SIGEV</h1>
-        <p class="text-sm text-slate-700">Ingresa tus credenciales para continuar</p>
+<div class="flex w-full flex-col gap-7 text-slate-700 [&_[data-flux-error]]:text-red-700">
+    <div class="space-y-2.5 text-center">
+        <h1 class="text-3xl font-bold tracking-tight text-[#102B50] sm:text-4xl">Inicia sesión</h1>
+        <p class="text-sm leading-6 text-slate-500">Ingresa tus credenciales para continuar</p>
     </div>
 
     <x-auth-session-status class="text-center text-green-800" :status="session('status')" />
 
     <form wire:submit="login" class="flex flex-col gap-5" data-sigev-login>
-        <flux:input wire:model="email" label:class="text-slate-800" label="Usuario o correo electrónico" type="text" name="email" icon="user" required autofocus autocomplete="username" placeholder="Ingresa tu usuario o correo" class:input="rounded-xl !bg-white text-slate-800 placeholder:text-slate-500 border-slate-300 focus:border-blue-800 focus:ring-blue-800 dark:!bg-white" class="[&_[data-flux-input]>div:first-child]:text-slate-600" />
+        <flux:input wire:model="email" label:class="font-semibold text-[#174A85]" label="Usuario o correo electrónico" type="text" name="email" icon="user" required autofocus autocomplete="username" placeholder="usuario@tecnm.mx" class:input="rounded-xl !border-[#E5EAF0] !bg-white text-slate-800 placeholder:text-slate-400 shadow-sm transition focus:!border-[#35A9E8] focus:!ring-2 focus:!ring-[#35A9E8]/20 dark:!bg-white" class="[&_[data-flux-input]>div:first-child]:text-[#174A85] [&_[data-flux-icon]]:text-[#174A85]" />
 
         <div class="relative" x-data="{ visible: false }">
-            <flux:input wire:model="password" label:class="text-slate-800" label="Contraseña" type="password" x-bind:type="visible ? 'text' : 'password'" name="password" icon="lock-closed" required autocomplete="current-password" placeholder="Ingresa tu contraseña" class:input="rounded-xl !bg-white text-slate-800 placeholder:text-slate-500 border-slate-300 focus:border-blue-800 focus:ring-blue-800 dark:!bg-white" class="[&_[data-flux-input]>div:first-child]:text-slate-600" />
-            <button type="button" class="absolute right-3 top-[2.35rem] rounded p-1 text-slate-600 transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-700" x-on:click="visible = !visible" x-bind:aria-label="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'" x-bind:title="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            <flux:input wire:model="password" label:class="font-semibold text-[#174A85]" label="Contraseña" type="password" x-bind:type="visible ? 'text' : 'password'" name="password" icon="lock-closed" required autocomplete="current-password" placeholder="Ingresa tu contraseña" class:input="rounded-xl !border-[#E5EAF0] !bg-white text-slate-800 placeholder:text-slate-400 shadow-sm transition focus:!border-[#35A9E8] focus:!ring-2 focus:!ring-[#35A9E8]/20 dark:!bg-white" class="[&_[data-flux-input]>div:first-child]:text-[#174A85] [&_[data-flux-icon]]:text-[#174A85]" />
+            <button type="button" class="absolute right-3 top-[1.95rem] flex size-8 items-center justify-center rounded-lg text-[#174A85] transition hover:bg-[#EAF3FF] hover:text-[#35A9E8] focus:outline-none focus:ring-2 focus:ring-[#35A9E8]/50" x-on:click="visible = !visible" x-bind:aria-label="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'" x-bind:title="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'">
                 <flux:icon name="eye" class="size-5" x-show="!visible" />
                 <flux:icon name="eye-slash" class="size-5" x-show="visible" />
             </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 text-slate-600 [&_[data-flux-label]]:text-slate-600 [&_[data-flux-checkbox]]:border-[#E5EAF0] [&_[data-flux-checkbox]:checked]:bg-[#174A85]">
+            <flux:checkbox wire:model="remember" label="Recordarme" class="!size-5 !border-2 !border-[#35A9E8] !bg-transparent shadow-sm data-checked:!border-[#35A9E8] data-checked:!bg-transparent [&_[data-flux-checkbox-indicator]]:!bg-transparent [&_[data-flux-checkbox-indicator]>svg:first-child]:!text-[#35A9E8]" />
             @if (Route::has('password.request'))
-                <div class="mt-2 text-right">
-                    <x-text-link class="text-sm font-semibold text-blue-900 hover:text-blue-950" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</x-text-link>
-                </div>
+                <x-text-link class="text-sm font-semibold !text-[#174A85] underline decoration-[#35A9E8]/60 underline-offset-4 transition hover:!text-[#35A9E8]" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</x-text-link>
             @endif
         </div>
 
-        <div class="text-slate-700 [&_[data-flux-label]]:text-slate-700">
-        <flux:checkbox wire:model="remember" label="Recordarme" />
-        </div>
-
-        <flux:button variant="primary" type="submit" class="mt-2 w-full justify-center bg-slate-900 text-white hover:bg-blue-950">
-            <span>Iniciar sesión</span>
-            <flux:icon name="arrow-right" class="ml-2 size-4" />
+        <flux:button variant="primary" type="submit" class="mt-1 w-full !flex-row justify-center whitespace-nowrap rounded-xl !bg-[#102B50] py-3 font-semibold text-white shadow-sm transition duration-200 hover:!bg-[#102B50] hover:shadow-md focus:!ring-4 focus:!ring-[#35A9E8]/25">
+            Iniciar sesión
         </flux:button>
     </form>
 </div>

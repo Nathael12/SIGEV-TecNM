@@ -32,10 +32,8 @@
                 @endif
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/10"></div>
 
-                <div class="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rotate-45 border border-sky-400/30"></div>
-                <div class="pointer-events-none absolute left-0 top-0 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rotate-45 border-8 border-sky-500/20"></div>
-                <div class="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rotate-45 border border-blue-300/30"></div>
-                <div class="pointer-events-none absolute bottom-0 right-0 h-48 w-48 translate-x-1/2 translate-y-1/2 rotate-45 border-8 border-blue-500/20"></div>
+                <div class="pointer-events-none absolute left-8 top-8 h-28 w-28 rotate-45 border border-sky-300/20 sm:left-12 sm:top-12 sm:h-36 sm:w-36"></div>
+                <div class="pointer-events-none absolute bottom-8 right-8 h-28 w-28 rotate-45 border border-blue-200/20 sm:bottom-12 sm:right-12 sm:h-36 sm:w-36"></div>
 
                 <div class="absolute inset-x-0 bottom-0 p-10 text-white xl:p-14">
                     <div class="mb-5 h-1 w-16 rounded-full bg-sky-400"></div>
