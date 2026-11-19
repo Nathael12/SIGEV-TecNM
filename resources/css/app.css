@@ -49,15 +49,15 @@
 
 @layer components {
     .maintenance-alert {
-        @apply flex w-full flex-col gap-2 rounded-2xl border bg-zinc-900 px-3 py-2 text-xs text-amber-200;
+        @apply flex w-full flex-col gap-2 rounded-xl border px-3 py-2 text-xs text-slate-700 shadow-sm dark:text-zinc-200;
     }
 
     .maintenance-alert--amber {
-        @apply border-amber-700;
+        @apply border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40;
     }
 
     .maintenance-alert--red {
-        @apply border-red-700;
+        @apply border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/40;
     }
 
     @media (min-width: 640px) {
@@ -99,4 +99,12 @@ select:focus[data-flux-control] {
     caret-color: #1E293B;
     -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset;
     box-shadow: 0 0 0 1000px #FFFFFF inset;
+}
+
+/* Edge agrega su propio boton de revelacion en inputs password.
+   Se oculta para evitar duplicarlo con los controles del sistema o de Flux.
+   Chrome y Firefox no exponen un pseudo-elemento equivalente interoperable. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }

@@ -28,13 +28,17 @@ class AlertasMantenimiento
             ->filter(function (Vehiculo $vehiculo) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;
 
-                return $mantenimiento && self::evaluarKilometraje(
+                return $mantenimiento && $mantenimiento->proximo_mantenimiento_km !== null && self::evaluarKilometraje(
                     (float) $vehiculo->{'kilometraje actual'},
                     (int) $mantenimiento->proximo_mantenimiento_km
                 ) !== null;
             })
             ->map(function (Vehiculo $vehiculo) {
                 $mantenimiento = $vehiculo->ultimoMantenimiento;
+                if ($mantenimiento->proximo_mantenimiento_km === null) {
+                    return $vehiculo;
+                }
+
                 $evaluacion = self::evaluarKilometraje(
                     (float) $vehiculo->{'kilometraje actual'},
                     (int) $mantenimiento->proximo_mantenimiento_km
