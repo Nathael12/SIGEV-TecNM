@@ -48,6 +48,33 @@ class Vehiculo extends Model
         return $this->hasMany(Mantenimiento::class, 'vehiculo_id', 'id_vehiculo');
     }
 
+    public function asignaciones(): HasMany
+    {
+        return $this->hasMany(AsignacionVehiculo::class, 'vehiculo_id', 'id_vehiculo');
+    }
+
+    /** Obtiene la asignación más reciente según la fecha de salida registrada. */
+    public function ultimaAsignacion(): HasOne
+    {
+        return $this->hasOne(AsignacionVehiculo::class, 'vehiculo_id', 'id_vehiculo')
+            ->ofMany(['fecha_salida' => 'max', 'id_asignacion' => 'max']);
+    }
+
+    public function getKilometrajeVigenteAttribute(): ?int
+    {
+        $asignacion = $this->ultimaAsignacion;
+        if ($asignacion) {
+            // La lectura inicial rige mientras la asignación sigue abierta; al cerrar, rige la final.
+            $kilometraje = $asignacion->kilometraje_final ?? $asignacion->kilometraje_inicial;
+
+            return $kilometraje !== null ? (int) $kilometraje : null;
+        }
+
+        $kilometraje = $this->getAttribute('kilometraje actual');
+
+        return $kilometraje !== null ? (int) round((float) $kilometraje) : null;
+    }
+
     public function ultimoMantenimiento(): HasOne
     {
         return $this->hasOne(Mantenimiento::class, 'vehiculo_id', 'id_vehiculo')->latestOfMany('id_mantenimiento');

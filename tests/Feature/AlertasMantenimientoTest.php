@@ -29,9 +29,9 @@ class AlertasMantenimientoTest extends TestCase
     private function mantenimiento(string $fecha, string $estado = 'pendiente'): Mantenimiento
     {
         $vehiculo = Vehiculo::create([
-            'numero_economico' => 'VEH-'.uniqid(), 'placas' => 'ABC-'.random_int(100, 999),
-            'marca' => 'Marca', 'modelo' => 'Modelo', 'anio' => 2024, 'tipo' => 'Sedan',
-            'color' => 'Blanco', 'combustible' => 'Gasolina', 'kilometraje' => 1000,
+            'numero_economico' => 'VEH-'.uniqid(), 'placas' => 'ABC-'.uniqid(),
+            'marca' => 'Marca', 'modelo' => 'Modelo', 'anio' => 2024, 'tipo vehiculo' => 'Sedan',
+            'color' => 'Blanco', 'tipo combustible' => 'Gasolina Magna', 'kilometraje actual' => 1000,
             'fecha_adquisicion' => '2024-01-01', 'estado' => 'Disponible',
         ]);
 
@@ -99,5 +99,77 @@ class AlertasMantenimientoTest extends TestCase
         $generador->ejecutar();
 
         $this->assertDatabaseHas('alertas_mantenimiento', ['mantenimiento_id' => $mantenimiento->id_mantenimiento, 'dias_anticipacion' => 15]);
+    }
+
+    public function test_actualiza_la_fecha_de_una_alerta_existente_si_cambia_la_programacion(): void
+    {
+        ConfiguracionAlerta::create(['entidad' => 'mantenimiento', 'dias_anticipacion' => 15, 'activo' => true]);
+        $mantenimiento = $this->mantenimiento('2026-11-20');
+        $generador = app(GenerarAlertasMantenimiento::class);
+        $generador->ejecutar();
+
+        $mantenimiento->update(['proximo_mantenimiento_fecha' => '2026-11-21']);
+        $generador->ejecutar();
+
+        $this->assertDatabaseCount('alertas_mantenimiento', 1);
+        $this->assertDatabaseHas('alertas_mantenimiento', [
+            'mantenimiento_id' => $mantenimiento->id_mantenimiento,
+            'fecha_mantenimiento' => '2026-11-21',
+            'estado' => 'activa',
+        ]);
+    }
+
+    public function test_reemplaza_alertas_activas_si_la_fecha_sale_del_periodo_de_anticipacion(): void
+    {
+        ConfiguracionAlerta::create(['entidad' => 'mantenimiento', 'dias_anticipacion' => 15, 'activo' => true]);
+        $mantenimiento = $this->mantenimiento('2026-11-20');
+        $generador = app(GenerarAlertasMantenimiento::class);
+        $generador->ejecutar();
+
+        $mantenimiento->update(['proximo_mantenimiento_fecha' => '2026-11-30']);
+        $generador->ejecutar();
+
+        $this->assertDatabaseHas('alertas_mantenimiento', [
+            'mantenimiento_id' => $mantenimiento->id_mantenimiento,
+            'estado' => 'reemplazada',
+        ]);
+    }
+
+    public function test_reactiva_la_alerta_si_cambia_una_programacion_que_ya_se_atendio(): void
+    {
+        ConfiguracionAlerta::create(['entidad' => 'mantenimiento', 'dias_anticipacion' => 15, 'activo' => true]);
+        $mantenimiento = $this->mantenimiento('2026-11-20');
+        $generador = app(GenerarAlertasMantenimiento::class);
+        $generador->ejecutar();
+        $alerta = $mantenimiento->alertas()->firstOrFail();
+        $alerta->update(['estado' => 'atendida', 'vista_en' => now()]);
+
+        $mantenimiento->update(['proximo_mantenimiento_fecha' => '2026-11-21']);
+        $generador->ejecutar();
+
+        $this->assertDatabaseCount('alertas_mantenimiento', 1);
+        $this->assertDatabaseHas('alertas_mantenimiento', [
+            'mantenimiento_id' => $mantenimiento->id_mantenimiento,
+            'fecha_mantenimiento' => '2026-11-21',
+            'estado' => 'activa',
+            'vista_en' => null,
+        ]);
+    }
+
+    public function test_usa_el_umbral_activo_mas_cercano_y_mantiene_una_sola_alerta_activa(): void
+    {
+        foreach ([15, 7, 3] as $dias) {
+            ConfiguracionAlerta::create(['entidad' => 'mantenimiento', 'dias_anticipacion' => $dias, 'activo' => true]);
+        }
+        $mantenimiento = $this->mantenimiento('2026-11-20');
+
+        app(GenerarAlertasMantenimiento::class)->ejecutar();
+
+        $this->assertDatabaseCount('alertas_mantenimiento', 1);
+        $this->assertDatabaseHas('alertas_mantenimiento', [
+            'mantenimiento_id' => $mantenimiento->id_mantenimiento,
+            'dias_anticipacion' => 7,
+            'estado' => 'activa',
+        ]);
     }
 }

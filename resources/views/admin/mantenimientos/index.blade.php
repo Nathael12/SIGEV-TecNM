@@ -35,9 +35,10 @@
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->fecha_mantenimiento->format('d/m/Y') }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ number_format($mantenimiento->kilometraje_mantenimiento) }} km</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">${{ number_format((float) $mantenimiento->monto_mantenimiento, 2) }}</td>
-                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha?->format('d/m/Y') ?? 'Sin fecha' }} · {{ $mantenimiento->proximo_mantenimiento_km !== null ? number_format($mantenimiento->proximo_mantenimiento_km) . ' km' : 'Sin kilometraje' }}</td>
+                        @php($proximoKilometraje = $mantenimiento->getRawOriginal('proximo_mantenimiento_km'))
+                        <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha?->format('d/m/Y') ?? 'Sin fecha' }} · {{ is_numeric($proximoKilometraje) && trim((string) $proximoKilometraje) !== '' ? number_format((float) $proximoKilometraje) . ' km' : 'Sin kilometraje' }}</td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
-                            @php($evaluacionKm = $mantenimiento->vehiculo->ultimoMantenimiento?->is($mantenimiento) ? \App\Support\AlertasMantenimiento::evaluarKilometraje((float) $mantenimiento->vehiculo->{'kilometraje actual'}, (int) $mantenimiento->proximo_mantenimiento_km) : null)
+                            @php($evaluacionKm = $mantenimiento->vehiculo->ultimoMantenimiento?->is($mantenimiento) ? \App\Support\AlertasMantenimiento::evaluarKilometraje((float) $mantenimiento->vehiculo->{'kilometraje actual'}, $mantenimiento->getRawOriginal('proximo_mantenimiento_km')) : null)
                             @php($alertaFecha = $mantenimiento->alertas->firstWhere('estado', 'activa'))
                             @if ($evaluacionKm || $alertaFecha)
                                 <div class="flex flex-col items-center gap-1">
