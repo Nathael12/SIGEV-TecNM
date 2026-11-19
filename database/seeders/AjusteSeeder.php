@@ -13,7 +13,7 @@ class AjusteSeeder extends Seeder
             [],
             [
                 'nombre' => 'SIGEV-TecNM',
-                'descripcion' => 'Sistema de Gestión Vehicular del Tecnológico Nacional de México, diseñado para facilitar la administración, el control y el seguimiento de la información relacionada con los vehículos institucionales.',
+                'descripcion' => 'Sistema de Gestión Vehicular del Instituto Tecnológico Superior de Hopelchén, diseñado para facilitar la administración y el control con los vehículos.',
                 'direccion' => 'Carretera Federal, Campeche-Hopelchen Km. 83, 24600 Hopelchén, Camp.',
                 'telefono' => '981 125 3486',
                 'email' => 'webmaster@hopelchen.tecnm.mx',
