@@ -65,6 +65,7 @@ class GenerarAlertasMantenimiento
                 $alertaNueva = $alerta->wasRecentlyCreated;
                 $fechaProgramada = $mantenimiento->proximo_mantenimiento_fecha->toDateString();
                 $fechaCambio = ! $alertaNueva && $alerta->fecha_mantenimiento?->toDateString() !== $fechaProgramada;
+                $tipoCambio = ! $alertaNueva && $alerta->tipo !== $tipo;
                 $reactivada = $alerta->estado === 'reemplazada';
 
                 // Una alerta atendida sigue cerrada mientras la programación no cambie.
@@ -74,7 +75,7 @@ class GenerarAlertasMantenimiento
 
                 if ($alertaNueva) {
                     $generadas++;
-                } elseif ($fechaCambio || $reactivada) {
+                } elseif ($fechaCambio || $tipoCambio || $reactivada) {
                     $alerta->tipo = $tipo;
                     $alerta->fecha_mantenimiento = $mantenimiento->proximo_mantenimiento_fecha;
                     $alerta->estado = 'activa';

@@ -1,31 +1,38 @@
 @props(['alertas'])
 
-<section aria-label="Alertas de mantenimiento" class="space-y-3">
+<section aria-label="Alertas de mantenimiento" class="space-y-2">
     @forelse ($alertas as $grupo)
         @php($mantenimiento = $grupo->first()->mantenimiento)
-        @php($vehiculo = $mantenimiento->vehiculo)
+        @php($vehiculo = $mantenimiento?->vehiculo)
+        @if (! $mantenimiento || ! $vehiculo)
+            @continue
+        @endif
         @php($alertaKm = $grupo->firstWhere('condicion', 'kilometraje'))
-        @php($alertaFecha = $grupo->firstWhere('condicion', 'fecha'))
+        @php($mostrarFecha = auth()->user()?->can('ver alertas mantenimiento') ?? false)
+        @php($alertaFecha = $mostrarFecha ? $grupo->firstWhere('condicion', 'fecha') : null)
+        @if (! $alertaKm && ! $alertaFecha)
+            @continue
+        @endif
         @php($km = $alertaKm ? \App\Support\AlertasMantenimiento::evaluarKilometraje((float) $vehiculo->{'kilometraje actual'}, $mantenimiento->getRawOriginal('proximo_mantenimiento_km')) : null)
-        @php($fechaProxima = $mantenimiento->proximo_mantenimiento_fecha)
+        @php($fechaProxima = $mostrarFecha ? $mantenimiento->proximo_mantenimiento_fecha : null)
         @php($dias = $fechaProxima ? (int) now()->startOfDay()->diffInDays($fechaProxima, false) : null)
         @php($vencido = ($km && $km['condicion'] === 'Vencido') || ($dias !== null && $dias < 0))
         <article role="status" class="maintenance-alert {{ $vencido ? 'maintenance-alert--red' : 'maintenance-alert--amber' }} flex-wrap">
-            <div class="min-w-0 flex-1 space-y-2">
-                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <div class="min-w-0 flex-1 space-y-1">
+                <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-tight">
                     @can('ver detalle vehiculo')
                         <a href="{{ route('admin.vehiculos.show', $vehiculo->id_vehiculo) }}" class="font-semibold text-blue-800 underline-offset-2 hover:underline dark:text-blue-200">{{ $vehiculo->numero_economico }} · {{ $vehiculo->marca }} {{ $vehiculo->modelo }}</a>
                     @else
                         <strong>{{ $vehiculo->numero_economico }} · {{ $vehiculo->marca }} {{ $vehiculo->modelo }}</strong>
                     @endcan
-                    <span class="text-xs">· Placas {{ $vehiculo->placas }} · {{ $mantenimiento->categoria_mantenimiento }}</span>
+                    <span class="text-xs">{{ $vehiculo->placas }} · {{ $mantenimiento->categoria_mantenimiento }}</span>
                 </div>
-                <div class="flex flex-wrap gap-2 text-xs">
+                <div class="flex flex-col gap-0.5 text-xs sm:flex-row sm:flex-wrap sm:gap-x-2">
                     @if ($alertaKm && $km)
-                        <span class="inline-flex rounded-full bg-sky-100 px-2.5 py-1 font-semibold text-sky-900 dark:bg-sky-950 dark:text-sky-200">Kilometraje · Actual {{ number_format((float) $vehiculo->{'kilometraje actual'}) }} km · Próximo {{ number_format((float) $mantenimiento->getRawOriginal('proximo_mantenimiento_km')) }} km · {{ $km['kilometros_restantes'] > 0 ? 'Faltan '.number_format($km['kilometros_restantes']).' km' : 'Vencido por '.number_format(abs($km['kilometros_restantes'])).' km' }}</span>
+                        <span class="font-semibold text-sky-900 dark:text-sky-200">Kilometraje: {{ number_format((float) $vehiculo->{'kilometraje actual'}) }} / {{ number_format((float) $mantenimiento->getRawOriginal('proximo_mantenimiento_km')) }} km · {{ $km['kilometros_restantes'] > 0 ? 'Faltan '.number_format($km['kilometros_restantes']).' km' : 'Vencido por '.number_format(abs($km['kilometros_restantes'])).' km' }}</span>
                     @endif
                     @if ($alertaFecha)
-                        <span class="inline-flex rounded-full bg-violet-100 px-2.5 py-1 font-semibold text-violet-900 dark:bg-violet-950 dark:text-violet-200">Fecha · {{ $fechaProxima->format('d/m/Y') }} · @if ($dias < 0)Vencida hace {{ abs($dias) }} {{ abs($dias) === 1 ? 'día' : 'días' }}@elseif ($dias === 0)Corresponde hoy @else Faltan {{ $dias }} {{ $dias === 1 ? 'día' : 'días' }}@endif</span>
+                        <span class="font-medium text-violet-900 dark:text-violet-200">Fecha: {{ $fechaProxima->format('d/m/Y') }} · @if ($dias < 0)Vencida hace {{ abs($dias) }} {{ abs($dias) === 1 ? 'día' : 'días' }}@elseif ($dias === 0)Corresponde hoy @else Faltan {{ $dias }} {{ $dias === 1 ? 'día' : 'días' }}@endif</span>
                     @endif
                     @if (! $alertaFecha && $fechaProxima)
                         <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-700 dark:bg-zinc-800 dark:text-zinc-300">Próximo servicio · {{ $fechaProxima->format('d/m/Y') }} · @if ($dias < 0){{ abs($dias) }} {{ abs($dias) === 1 ? 'día vencido' : 'días vencidos' }}@elseif ($dias === 0)hoy @else faltan {{ $dias }} {{ $dias === 1 ? 'día' : 'días' }}@endif</span>

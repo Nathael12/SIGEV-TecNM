@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\AlertaMantenimiento;
 use App\Models\Mantenimiento;
 use App\Models\Vehiculo;
-use App\Support\AlertasMantenimiento as ConsultaAlertasMantenimiento;
 use App\Services\GenerarAlertasMantenimiento;
 use Illuminate\Support\Carbon;
 
@@ -24,12 +23,15 @@ class AdminController extends Controller
 
         $totalVehiculos = (int) $conteosPorEstado->sum();
         $mantenimientosPendientes = Mantenimiento::where('estado_mantenimiento', 'pendiente')->count();
+        $generadorAlertas->sincronizarKilometraje();
         $alertasMantenimiento = AlertaMantenimiento::with('mantenimiento.vehiculo')
             ->where('estado', 'activa')
+            ->whereHas('mantenimiento.vehiculo')
             ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
             ->orderBy('fecha_mantenimiento')
-            ->get();
-        $mantenimientosProximos = $alertasMantenimiento->where('tipo', 'proxima')->count();
+            ->get()
+            ->groupBy('mantenimiento_id');
+        $mantenimientosProximos = $alertasMantenimiento->flatten(1)->where('tipo', 'proxima')->count();
 
         $indicadoresVehiculos = [
             ['titulo' => 'Total de vehículos', 'cantidad' => $totalVehiculos, 'icono' => 'truck', 'color' => 'blue'],
@@ -44,7 +46,6 @@ class AdminController extends Controller
         $distribucionVehiculos = collect(['Disponible', 'Asignado', 'En mantenimiento', 'Fuera de servicio', 'Baja'])
             ->map(fn ($estado) => ['estado' => $estado, 'total' => (int) $conteosPorEstado->get($estado, 0)]);
         $vehiculos = Vehiculo::with('ultimoMantenimiento')->orderBy('numero_economico')->get();
-        $alertasKilometraje = ConsultaAlertasMantenimiento::obtener();
         return view('admin.index', [
             'dashboardDate' => Carbon::now()->locale('es')->translatedFormat('l, d \\d\\e F \\d\\e Y'),
             'rolUsuario' => $rolUsuario,
@@ -52,7 +53,6 @@ class AdminController extends Controller
             'distribucionVehiculos' => $distribucionVehiculos,
             'totalVehiculos' => $totalVehiculos,
             'vehiculos' => $vehiculos,
-            'alertasKilometraje' => $alertasKilometraje,
             'alertasMantenimiento' => $alertasMantenimiento,
         ]);
     }

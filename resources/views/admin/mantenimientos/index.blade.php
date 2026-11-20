@@ -18,10 +18,26 @@
     <div class="mt-6 overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
         <table class="w-full min-w-[1200px] border-collapse">
             <thead class="bg-gray-50 text-center dark:bg-zinc-900"><tr>
-                @foreach (['Nro.', 'Núm. económico', 'Vehículo', 'Placas', 'Categoría', 'Fecha del servicio', 'Kilometraje', 'Monto', 'Próximo mantenimiento'] as $encabezado)
-                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">{{ $encabezado }}</th>
+                @foreach (['Nro.' => null, 'Núm. económico' => 'numero_economico', 'Vehículo' => 'vehiculo', 'Placas' => 'placas', 'Categoría' => 'categoria', 'Fecha del servicio' => 'fecha', 'Kilometraje' => null, 'Monto' => 'monto', 'Próximo mantenimiento' => 'proximo'] as $encabezado => $claveOrden)
+                    <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">
+                        @if ($claveOrden)
+                            @php($direccionSiguiente = $ordenActual === $claveOrden && $direccionActual === 'asc' ? 'desc' : 'asc')
+                            <a href="{{ route('admin.mantenimientos.index', array_merge(request()->query(), ['orden' => $claveOrden, 'direccion' => $direccionSiguiente])) }}" class="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Ordenar por {{ $encabezado }} {{ $direccionSiguiente === 'asc' ? 'ascendente' : 'descendente' }}">
+                                {{ $encabezado }}
+                                <span class="text-[10px]" aria-hidden="true">{{ $ordenActual === $claveOrden ? ($direccionActual === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                            </a>
+                        @else
+                            {{ $encabezado }}
+                        @endif
+                    </th>
                 @endforeach
-                <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">ESTADO DE ALERTA</th>
+                <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">
+                    @php($direccionSiguiente = $ordenActual === 'alerta' && $direccionActual === 'asc' ? 'desc' : 'asc')
+                    <a href="{{ route('admin.mantenimientos.index', array_merge(request()->query(), ['orden' => 'alerta', 'direccion' => $direccionSiguiente])) }}" class="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Ordenar por estado de alerta {{ $direccionSiguiente === 'asc' ? 'ascendente' : 'descendente' }}">
+                        ESTADO DE ALERTA
+                        <span class="text-[10px]" aria-hidden="true">{{ $ordenActual === 'alerta' ? ($direccionActual === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                    </a>
+                </th>
                 <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Acciones</th>
             </tr></thead>
             <tbody>

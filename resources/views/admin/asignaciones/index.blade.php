@@ -113,10 +113,19 @@
         <table class="min-w-full border-collapse">
             <thead class="bg-gray-50 dark:bg-zinc-900 text-center">
                 <tr>
-                    @foreach (['Nro', 'Vehículo', 'Solicitante', 'Salida', 'Regreso', 'Destino', 'Kilometraje', 'Estado', 'Acciones'] as $columna)
+                    @foreach (['Nro' => null, 'Vehículo' => 'vehiculo', 'Solicitante' => 'solicitante', 'Salida' => 'salida', 'Regreso' => 'regreso', 'Destino' => 'destino', 'Kilometraje' => null, 'Estado' => 'estado', 'Acciones' => null] as $columna => $claveOrden)
                         <th
                             class="px-6 py-3 border-x border-b border-gray-200 dark:border-zinc-700 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ $columna }}</th>
+                            @if ($claveOrden)
+                                @php($direccionSiguiente = $ordenActual === $claveOrden && $direccionActual === 'asc' ? 'desc' : 'asc')
+                                <a href="{{ route('admin.asignaciones.index', array_merge(request()->query(), ['orden' => $claveOrden, 'direccion' => $direccionSiguiente])) }}" class="inline-flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400" aria-label="Ordenar por {{ $columna }} {{ $direccionSiguiente === 'asc' ? 'ascendente' : 'descendente' }}">
+                                    {{ $columna }}
+                                    <span class="text-[10px]" aria-hidden="true">{{ $ordenActual === $claveOrden ? ($direccionActual === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                                </a>
+                            @else
+                                {{ $columna }}
+                            @endif
+                        </th>
                     @endforeach
                 </tr>
             </thead>
@@ -158,7 +167,7 @@
 
                         <td
                             class="px-3 py-2 border border-gray-200 dark:border-zinc-700 whitespace-nowrap text-sm text-center">
-                            <span style="{{ $estilos[$asignacion->estado_asignacion] }}"
+                            <span @style([$estilos[$asignacion->estado_asignacion]])
                                 class="inline-block px-3 py-1 text-xs font-semibold rounded-full">
                                 {{ $asignacion->estado_asignacion }}
                             </span>
@@ -205,8 +214,8 @@
     @if (session('mensaje'))
         <script>
             Swal.fire({
-                icon: @json(session('icono', 'success')),
-                title: @json(session('mensaje')),
+                icon: "{{ session('icono', 'success') }}",
+                title: "{{ session('mensaje') }}",
                 showConfirmButton: false,
                 timer: 3000
             });

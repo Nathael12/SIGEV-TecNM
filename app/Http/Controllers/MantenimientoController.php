@@ -14,17 +14,49 @@ class MantenimientoController extends Controller
     {
         $generadorAlertas->ejecutar();
         $generadorAlertas->sincronizarKilometraje();
+        $columnasOrdenables = [
+            'numero_economico' => fn ($query, $direccion) => $query->orderBy(Vehiculo::select('numero_economico')->whereColumn('vehiculos.id_vehiculo', 'mantenimientos.vehiculo_id'), $direccion),
+            'vehiculo' => fn ($query, $direccion) => $query
+                ->orderBy(Vehiculo::select('marca')->whereColumn('vehiculos.id_vehiculo', 'mantenimientos.vehiculo_id'), $direccion)
+                ->orderBy(Vehiculo::select('modelo')->whereColumn('vehiculos.id_vehiculo', 'mantenimientos.vehiculo_id'), $direccion),
+            'placas' => fn ($query, $direccion) => $query->orderBy(Vehiculo::select('placas')->whereColumn('vehiculos.id_vehiculo', 'mantenimientos.vehiculo_id'), $direccion),
+            'categoria' => fn ($query, $direccion) => $query->orderBy('categoria_mantenimiento', $direccion),
+            'fecha' => fn ($query, $direccion) => $query->orderBy('fecha_mantenimiento', $direccion),
+            'monto' => fn ($query, $direccion) => $query->orderBy('monto_mantenimiento', $direccion),
+            'proximo' => fn ($query, $direccion) => $query->orderBy('proximo_mantenimiento_fecha', $direccion)->orderBy('proximo_mantenimiento_km', $direccion),
+            'alerta' => fn ($query, $direccion) => $query->orderBy(\Illuminate\Support\Facades\DB::table('alertas_mantenimiento')
+                ->selectRaw("CASE WHEN estado = 'activa' THEN 0 WHEN estado = 'atendida' THEN 1 ELSE 2 END")
+                ->whereColumn('mantenimiento_id', 'mantenimientos.id_mantenimiento')
+                ->orderByRaw("CASE WHEN estado = 'activa' THEN 0 WHEN estado = 'atendida' THEN 1 ELSE 2 END")
+                ->limit(1), $direccion),
+        ];
+        $orden = $request->query('orden');
+        $direccion = $request->query('direccion');
+        if (! isset($columnasOrdenables[$orden]) || ! in_array($direccion, ['asc', 'desc'], true)) {
+            $orden = null;
+            $direccion = 'desc';
+        }
+
         $consulta = Mantenimiento::with([
             'vehiculo.ultimoMantenimiento',
             'alertas' => fn ($consulta) => $consulta->orderByDesc('id'),
-        ])->orderByDesc('fecha_mantenimiento')->orderByDesc('id_mantenimiento');
+        ]);
+        if ($orden !== null) {
+            $columnasOrdenables[$orden]($consulta, $direccion);
+            $consulta->orderBy('id_mantenimiento', $direccion);
+        } else {
+            $consulta->orderByDesc('fecha_mantenimiento')->orderByDesc('id_mantenimiento');
+        }
 
         $mantenimientos = $consulta->get();
 
         return view('admin.mantenimientos.index', [
             'mantenimientos' => $mantenimientos,
+            'ordenActual' => $orden,
+            'direccionActual' => $direccion,
             'alertasUnificadas' => AlertaMantenimiento::with('mantenimiento.vehiculo')
-                ->where('estado', 'activa')->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
+                ->where('estado', 'activa')->whereHas('mantenimiento.vehiculo')
+                ->orderByRaw("CASE WHEN tipo = 'vencida' THEN 0 ELSE 1 END")
                 ->orderBy('fecha_mantenimiento')->get()->groupBy('mantenimiento_id'),
         ]);
     }

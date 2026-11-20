@@ -50,29 +50,6 @@
                 </div>
             </header>
 
-            {{-- INDICADORES (franja compacta) --}}
-            <section aria-label="Indicadores de la flotilla" class="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
-                @foreach ($indicadoresVehiculos as $indicador)
-                    <article class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                        <span @class([
-                            'flex size-9 shrink-0 items-center justify-center rounded-lg',
-                            'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300' => $indicador['color'] === 'blue',
-                            'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' => $indicador['color'] === 'emerald',
-                            'bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300' => $indicador['color'] === 'indigo',
-                            'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300' => $indicador['color'] === 'amber',
-                            'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300' => $indicador['color'] === 'orange',
-                            'bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300' => $indicador['color'] === 'slate',
-                        ])>
-                            <flux:icon :name="$indicador['icono']" class="size-4" />
-                        </span>
-                        <div class="min-w-0">
-                            <p class="text-xl font-bold leading-none text-slate-900 dark:text-white">{{ $indicador['cantidad'] }}</p>
-                            <h2 class="mt-1 truncate text-[11px] font-medium leading-tight text-slate-600 dark:text-zinc-300" title="{{ $indicador['titulo'] }}">{{ $indicador['titulo'] }}</h2>
-                        </div>
-                    </article>
-                @endforeach
-            </section>
-
             @if (session('mensaje'))
                 <div role="status" class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200">{{ session('mensaje') }}</div>
             @endif
@@ -191,7 +168,7 @@
                     <section aria-labelledby="distribucion-title" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <h2 id="distribucion-title" class="font-bold text-slate-900 dark:text-white">Distribución de vehículos</h2>
+                                <h2 id="distribucion-title" class="font-bold text-slate-900 dark:text-white">Estadística de Vehículos</h2>
                                 <p class="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">{{ $totalVehiculos }} vehículos por estado</p>
                             </div>
                             <span class="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-950 dark:text-blue-200">Flotilla</span>
@@ -226,76 +203,79 @@
                         </div>
                     </section>
 
-                    {{-- Alertas --}}
-                    <section aria-label="Alertas" class="max-h-[32rem] space-y-3 overflow-y-auto pr-1">
-                        <x-alertas-mantenimiento :alertas="$alertasKilometraje" />
-                        <x-alertas-documentos />
+                    {{-- ALERTAS: encabezado fijo, contenido con scroll interno --}}
+                    @php($totalAlertas = $alertasMantenimiento->count())
+                    <section aria-labelledby="alertas-title" class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                        <header class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-zinc-800">
+                            <div class="flex min-w-0 items-center gap-2.5">
+                                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300"><flux:icon name="bell-alert" class="size-5" /></span>
+                                <div class="min-w-0">
+                                    <h2 id="alertas-title" class="truncate text-sm font-bold text-slate-900 dark:text-white">Alertas de mantenimiento</h2>
+                                    <p class="truncate text-[11px] text-slate-500 dark:text-zinc-400">Vencimientos y servicios próximos</p>
+                                </div>
+                            </div>
+                            <span @class([
+                                'shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold',
+                                'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-200' => $totalAlertas > 0,
+                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200' => $totalAlertas === 0,
+                            ])>{{ $totalAlertas }} {{ $totalAlertas === 1 ? 'activa' : 'activas' }}</span>
+                        </header>
+
+                        <div class="max-h-[22rem] space-y-2 overflow-y-auto p-3 [scrollbar-width:thin]">
+                            <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
+                            <x-alertas-documentos />
+
+                            @if ($totalAlertas === 0)
+                                <div class="flex flex-col items-center gap-2 rounded-xl bg-emerald-50/60 px-4 py-8 text-center dark:bg-emerald-950/20">
+                                    <span class="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300"><flux:icon name="check-circle" class="size-6" /></span>
+                                    <p class="text-sm font-semibold text-slate-800 dark:text-zinc-100">Todo en orden</p>
+                                    <p class="text-xs text-slate-500 dark:text-zinc-400">No hay mantenimientos pendientes de atención.</p>
+                                </div>
+                            @endif
+                        </div>
                     </section>
                 </aside>
             </div>
 
-            {{-- ALERTAS DE MANTENIMIENTO POR FECHA --}}
-            @can('ver alertas mantenimiento')
-                <section aria-labelledby="alertas-title" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                    <div class="mb-3 flex items-center justify-between gap-3">
-                        <div>
-                            <h2 id="alertas-title" class="font-bold text-slate-900 dark:text-white">Alertas de mantenimiento</h2>
-                            <p class="text-xs text-slate-500 dark:text-zinc-400">Vencimientos y servicios próximos según la programación vigente.</p>
-                        </div>
-                        <span class="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-200">{{ $alertasMantenimiento->count() }} activas</span>
-                    </div>
-                    <x-alertas-fecha-mantenimiento :alertas="$alertasMantenimiento" />
-                    @if ($alertasMantenimiento->isEmpty())
-                        <p class="rounded-lg bg-slate-50 px-3 py-4 text-center text-sm text-slate-500 dark:bg-zinc-800 dark:text-zinc-400">No hay mantenimientos por fecha pendientes de atención.</p>
-                    @endif
-                </section>
-            @endcan
         </div>
 
-        {{-- MODAL DE DETALLE --}}
+        {{-- MODAL DE DETALLE (compacto, sin scroll) --}}
         <div x-cloak x-show="vehiculo" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" @click.self="vehiculo = null" role="presentation">
-            <section role="dialog" aria-modal="true" aria-labelledby="vehicle-dialog-title" class="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-zinc-900" @click.stop>
+            <section role="dialog" aria-modal="true" aria-labelledby="vehicle-dialog-title" class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-zinc-900" @click.stop>
                 <template x-if="vehiculo">
                     <div>
-                        {{-- Foto grande arriba --}}
                         <div class="relative overflow-hidden rounded-t-2xl bg-slate-100 dark:bg-zinc-800">
                             <template x-if="vehiculo.fotografia">
-                                <img :src="vehiculo.fotografia" :alt="'Fotografía de ' + vehiculo.marca + ' ' + vehiculo.modelo" class="aspect-[16/9] w-full object-cover">
+                                <img :src="vehiculo.fotografia" :alt="'Fotografía de ' + vehiculo.marca + ' ' + vehiculo.modelo" class="h-44 w-full object-cover sm:h-48">
                             </template>
                             <template x-if="!vehiculo.fotografia">
-                                <div class="flex aspect-[16/9] items-center justify-center text-slate-400"><flux:icon name="truck" class="size-20" /></div>
+                                <div class="flex h-44 items-center justify-center text-slate-400 sm:h-48"><flux:icon name="truck" class="size-14" /></div>
                             </template>
-                            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
-                            <button type="button" @click="vehiculo = null" aria-label="Cerrar detalles" class="absolute right-3 top-3 rounded-full bg-black/40 p-2 text-white backdrop-blur hover:bg-black/60">
-                                <flux:icon name="x-mark" class="size-5" />
+                            <div class="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-950/85 to-transparent"></div>
+                            <button type="button" @click="vehiculo = null" aria-label="Cerrar detalles" class="absolute right-2.5 top-2.5 rounded-full bg-black/45 p-1.5 text-white backdrop-blur hover:bg-black/70">
+                                <flux:icon name="x-mark" class="size-4" />
                             </button>
-                            <div class="absolute inset-x-0 bottom-0 p-5 text-white">
-                                <p class="text-xs font-semibold uppercase tracking-wide text-blue-200">Ficha del vehículo</p>
-                                <h2 id="vehicle-dialog-title" class="text-2xl font-bold leading-tight">
-                                    <span x-text="vehiculo.marca"></span> <span x-text="vehiculo.modelo"></span>
-                                </h2>
-                                <p class="text-sm text-white/80">N.º <span x-text="vehiculo.numero"></span></p>
+                            <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 px-4 pb-3 text-white">
+                                <div class="min-w-0">
+                                    <h2 id="vehicle-dialog-title" class="truncate text-lg font-bold leading-tight"><span x-text="vehiculo.marca"></span> <span x-text="vehiculo.modelo"></span></h2>
+                                    <p class="text-xs text-white/80">N.º <span x-text="vehiculo.numero"></span> · <span x-text="vehiculo.anio"></span></p>
+                                </div>
+                                <span class="shrink-0 rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-semibold backdrop-blur" x-text="vehiculo.estado"></span>
                             </div>
                         </div>
 
-                        <dl class="grid grid-cols-2 gap-x-4 gap-y-4 p-5 text-sm sm:grid-cols-3">
-                            <div><dt class="text-xs text-slate-500">Año</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.anio"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Placas</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.placas"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Estado</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.estado"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Tipo</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.tipo || 'No registrado'"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Kilometraje</dt><dd class="font-semibold text-slate-900 dark:text-white"><span x-text="Number(vehiculo.kilometraje).toLocaleString('es-MX')"></span> km</dd></div>
-                            <div><dt class="text-xs text-slate-500">Color</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.color || 'No registrado'"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Combustible</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.combustible || 'No registrado'"></dd></div>
-                            <div><dt class="text-xs text-slate-500">Adquisición</dt><dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.fecha || 'No registrada'"></dd></div>
-                            <div class="col-span-2 sm:col-span-3 rounded-lg bg-slate-50 p-3 dark:bg-zinc-800">
-                                <dt class="text-xs text-slate-500">Último mantenimiento</dt>
-                                <dd class="font-semibold text-slate-900 dark:text-white" x-text="vehiculo.mantenimiento ? vehiculo.mantenimiento + (vehiculo.descripcion ? ' · ' + vehiculo.descripcion : '') : 'Sin mantenimiento registrado'"></dd>
+                        <dl class="grid grid-cols-3 gap-x-3 gap-y-3 px-4 py-4 text-xs">
+                            <div><dt class="text-[11px] text-slate-500">Placas</dt><dd class="truncate font-semibold text-slate-900 dark:text-white" x-text="vehiculo.placas"></dd></div>
+                            <div><dt class="text-[11px] text-slate-500">Tipo</dt><dd class="truncate font-semibold text-slate-900 dark:text-white" x-text="vehiculo.tipo || 'No registrado'"></dd></div>
+                            <div><dt class="text-[11px] text-slate-500">Kilometraje</dt><dd class="truncate font-semibold text-slate-900 dark:text-white"><span x-text="Number(vehiculo.kilometraje).toLocaleString('es-MX')"></span> km</dd></div>
+                            <div><dt class="text-[11px] text-slate-500">Color</dt><dd class="truncate font-semibold text-slate-900 dark:text-white" x-text="vehiculo.color || 'No registrado'"></dd></div>
+                            <div><dt class="text-[11px] text-slate-500">Combustible</dt><dd class="truncate font-semibold text-slate-900 dark:text-white" x-text="vehiculo.combustible || 'No registrado'"></dd></div>
+                            <div><dt class="text-[11px] text-slate-500">Adquisición</dt><dd class="truncate font-semibold text-slate-900 dark:text-white" x-text="vehiculo.fecha || 'No registrada'"></dd></div>
+                            <div class="col-span-3 rounded-lg bg-slate-50 px-3 py-2 dark:bg-zinc-800">
+                                <dt class="text-[11px] text-slate-500">Último mantenimiento</dt>
+                                <dd class="line-clamp-2 font-semibold text-slate-900 dark:text-white" x-text="vehiculo.mantenimiento ? vehiculo.mantenimiento + (vehiculo.descripcion ? ' · ' + vehiculo.descripcion : '') : 'Sin mantenimiento registrado'"></dd>
                             </div>
                         </dl>
-
-                        <div class="flex justify-end border-t border-slate-200 px-5 py-3 dark:border-zinc-800">
-                            <button type="button" @click="vehiculo = null" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Cerrar</button>
-                        </div>
                     </div>
                 </template>
             </section>

@@ -68,9 +68,37 @@ class AsignacionController extends Controller
      */
     public function index(Request $request)
     {
+        // Columnas permitidas para ordenar. Los campos relacionados se ordenan
+        // mediante subconsultas para conservar la consulta y sus filtros actuales.
+        $columnasOrdenables = [
+            'vehiculo' => fn ($query, $direccion) => $query
+                ->orderBy(Vehiculo::select('numero_economico')->whereColumn('vehiculos.id_vehiculo', 'asignacion_vehiculos.vehiculo_id'), $direccion)
+                ->orderBy(Vehiculo::select('placas')->whereColumn('vehiculos.id_vehiculo', 'asignacion_vehiculos.vehiculo_id'), $direccion),
+            'solicitante' => fn ($query, $direccion) => $query
+                ->orderBy(User::withTrashed()->select('nombre_usuario')->whereColumn('users.id', 'asignacion_vehiculos.usuario_id'), $direccion)
+                ->orderBy(User::withTrashed()->select('apellido_paterno')->whereColumn('users.id', 'asignacion_vehiculos.usuario_id'), $direccion)
+                ->orderBy(User::withTrashed()->select('apellido_materno')->whereColumn('users.id', 'asignacion_vehiculos.usuario_id'), $direccion),
+            'salida' => fn ($query, $direccion) => $query->orderBy('fecha_salida', $direccion),
+            'regreso' => fn ($query, $direccion) => $query->orderBy('fecha_regreso', $direccion),
+            'destino' => fn ($query, $direccion) => $query->orderBy('destino_vehiculo', $direccion),
+            'estado' => fn ($query, $direccion) => $query->orderBy('estado_asignacion', $direccion),
+        ];
+        $orden = $request->query('orden');
+        $direccion = $request->query('direccion');
+        if (! isset($columnasOrdenables[$orden]) || ! in_array($direccion, ['asc', 'desc'], true)) {
+            $orden = null;
+            $direccion = 'asc';
+        }
+
         // Orden de registro: la primera asignación creada va arriba y las nuevas se agregan abajo
-        $consulta = AsignacionVehiculo::with(['vehiculo', 'solicitante'])
-            ->orderBy('id_asignacion');
+        $consulta = AsignacionVehiculo::with(['vehiculo', 'solicitante']);
+
+        if ($orden !== null) {
+            $columnasOrdenables[$orden]($consulta, $direccion);
+            $consulta->orderBy('id_asignacion', $direccion);
+        } else {
+            $consulta->orderBy('id_asignacion');
+        }
 
         if ($request->filled('vehiculo')) {
             $consulta->where('vehiculo_id', $request->vehiculo);
@@ -98,7 +126,10 @@ class AsignacionController extends Controller
         // Cuántos vehículos están en ruta ahora mismo
         $enRuta = AsignacionVehiculo::activas()->count();
 
-        return view('admin.asignaciones.index', compact('asignaciones', 'vehiculos', 'solicitantes', 'enRuta'));
+        $ordenActual = $orden;
+        $direccionActual = $direccion;
+
+        return view('admin.asignaciones.index', compact('asignaciones', 'vehiculos', 'solicitantes', 'enRuta', 'ordenActual', 'direccionActual'));
     }
 
     /**
