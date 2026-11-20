@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\AlertaMantenimiento;
 use App\Models\ConfiguracionAlerta;
 use App\Models\Mantenimiento;
+use App\Models\Vehiculo;
+use App\Support\AlertasMantenimiento as EvaluadorKilometraje;
 use Illuminate\Support\Carbon;
 
 class GenerarAlertasMantenimiento
@@ -22,7 +24,7 @@ class GenerarAlertasMantenimiento
         }
 
         if ($umbrales->isEmpty()) {
-            AlertaMantenimiento::where('estado', 'activa')->update(['estado' => 'reemplazada']);
+            AlertaMantenimiento::where('condicion', 'fecha')->where('estado', 'activa')->update(['estado' => 'reemplazada']);
 
             return 0;
         }
@@ -42,6 +44,7 @@ class GenerarAlertasMantenimiento
                 }
 
                 AlertaMantenimiento::where('mantenimiento_id', $mantenimiento->id_mantenimiento)
+                    ->where('condicion', 'fecha')
                     ->where('estado', 'activa')
                     ->where('dias_anticipacion', '!=', $umbral)
                     ->update(['estado' => 'reemplazada']);
@@ -49,6 +52,7 @@ class GenerarAlertasMantenimiento
                 $tipo = $dias < 0 ? 'vencida' : 'proxima';
                 $alerta = AlertaMantenimiento::firstOrCreate(
                     [
+                        'condicion' => 'fecha',
                         'mantenimiento_id' => $mantenimiento->id_mantenimiento,
                         'dias_anticipacion' => $umbral,
                     ],
@@ -61,17 +65,16 @@ class GenerarAlertasMantenimiento
                 $alertaNueva = $alerta->wasRecentlyCreated;
                 $fechaProgramada = $mantenimiento->proximo_mantenimiento_fecha->toDateString();
                 $fechaCambio = ! $alertaNueva && $alerta->fecha_mantenimiento?->toDateString() !== $fechaProgramada;
-                $tipoCambio = ! $alertaNueva && $alerta->tipo !== $tipo;
                 $reactivada = $alerta->estado === 'reemplazada';
 
                 // Una alerta atendida sigue cerrada mientras la programación no cambie.
-                if ($alerta->estado === 'atendida' && ! $fechaCambio && ! $tipoCambio) {
+                if ($alerta->estado === 'atendida') {
                     return;
                 }
 
                 if ($alertaNueva) {
                     $generadas++;
-                } elseif ($fechaCambio || $tipoCambio || $reactivada) {
+                } elseif ($fechaCambio || $reactivada) {
                     $alerta->tipo = $tipo;
                     $alerta->fecha_mantenimiento = $mantenimiento->proximo_mantenimiento_fecha;
                     $alerta->estado = 'activa';
@@ -82,7 +85,7 @@ class GenerarAlertasMantenimiento
             });
 
         // Cierra avisos que ya no corresponden a una programación pendiente vigente.
-        AlertaMantenimiento::query()->where('estado', 'activa')
+        AlertaMantenimiento::query()->where('condicion', 'fecha')->where('estado', 'activa')
             ->whereDoesntHave('mantenimiento', function ($consulta) use ($hoy, $maximoDias) {
                 $consulta->where('estado_mantenimiento', 'pendiente')
                     ->whereNotNull('proximo_mantenimiento_fecha')
@@ -91,5 +94,44 @@ class GenerarAlertasMantenimiento
             ->update(['estado' => 'reemplazada']);
 
         return $generadas;
+    }
+
+    /** Persiste la condición de kilometraje usando el mismo umbral que la alerta original. */
+    public function sincronizarKilometraje(): void
+    {
+        Vehiculo::with('ultimoMantenimiento')->get()->each(function (Vehiculo $vehiculo): void {
+            $mantenimiento = $vehiculo->ultimoMantenimiento;
+            if (! $mantenimiento) {
+                return;
+            }
+
+            $evaluacion = EvaluadorKilometraje::evaluarKilometraje(
+                (float) $vehiculo->{'kilometraje actual'},
+                $mantenimiento->getRawOriginal('proximo_mantenimiento_km')
+            );
+            $alerta = AlertaMantenimiento::firstOrNew([
+                'mantenimiento_id' => $mantenimiento->id_mantenimiento,
+                'condicion' => 'kilometraje',
+                'dias_anticipacion' => 0,
+            ]);
+
+            if ($evaluacion === null) {
+                if ($alerta->exists && $alerta->estado === 'activa') {
+                    $alerta->update(['estado' => 'reemplazada']);
+                }
+                return;
+            }
+
+            // Una notificación atendida no se reactiva por la misma programación.
+            if ($alerta->exists && $alerta->estado === 'atendida') {
+                return;
+            }
+
+            $alerta->fill([
+                'tipo' => $evaluacion['condicion'] === 'Vencido' ? 'vencida' : 'proxima',
+                'fecha_mantenimiento' => $mantenimiento->proximo_mantenimiento_fecha ?? $mantenimiento->fecha_mantenimiento,
+                'estado' => 'activa',
+            ])->save();
+        });
     }
 }

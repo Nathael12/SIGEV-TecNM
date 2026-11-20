@@ -6,11 +6,11 @@
     @if (session('mensaje'))
         <div class="mb-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
     @endif
+    @error('alerta')
+        <div role="alert" class="mb-4 rounded-lg bg-amber-100 px-4 py-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-200">{{ $message }}</div>
+    @enderror
     <div class="mb-6 space-y-3">
-        <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
-        @can('ver alertas mantenimiento')
-            <x-alertas-fecha-mantenimiento :alertas="$alertasFecha" />
-        @endcan
+        <x-alertas-mantenimiento :alertas="$alertasUnificadas" />
     </div>
     <div class="flex justify-end">
         <a href="{{ route('admin.mantenimientos.create') }}" class="inline-flex items-center rounded bg-blue-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-600"><i class="fas fa-plus mr-2"></i> Registrar mantenimiento</a>
@@ -21,7 +21,7 @@
                 @foreach (['Nro.', 'Núm. económico', 'Vehículo', 'Placas', 'Categoría', 'Fecha del servicio', 'Kilometraje', 'Monto', 'Próximo mantenimiento'] as $encabezado)
                     <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">{{ $encabezado }}</th>
                 @endforeach
-                <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Alerta</th>
+                <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">ESTADO DE ALERTA</th>
                 <th class="border-x border-b border-gray-200 px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 dark:border-zinc-700 dark:text-gray-300">Acciones</th>
             </tr></thead>
             <tbody>
@@ -37,35 +37,15 @@
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">${{ number_format((float) $mantenimiento->monto_mantenimiento, 2) }}</td>
                         @php($proximoKilometraje = $mantenimiento->getRawOriginal('proximo_mantenimiento_km'))
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">{{ $mantenimiento->proximo_mantenimiento_fecha?->format('d/m/Y') ?? 'Sin fecha' }} · {{ is_numeric($proximoKilometraje) && trim((string) $proximoKilometraje) !== '' ? number_format((float) $proximoKilometraje) . ' km' : 'Sin kilometraje' }}</td>
+                        @php($alertaActiva = $mantenimiento->alertas->firstWhere('estado', 'activa'))
+                        @php($alertaAtendida = $mantenimiento->alertas->firstWhere('estado', 'atendida'))
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
-                            @php($evaluacionKm = $mantenimiento->vehiculo->ultimoMantenimiento?->is($mantenimiento) ? \App\Support\AlertasMantenimiento::evaluarKilometraje((float) $mantenimiento->vehiculo->{'kilometraje actual'}, $mantenimiento->getRawOriginal('proximo_mantenimiento_km')) : null)
-                            @php($alertaFecha = $mantenimiento->alertas->firstWhere('estado', 'activa'))
-                            @if ($evaluacionKm || $alertaFecha)
-                                <div class="flex flex-col items-center gap-1">
-                                    @if ($evaluacionKm)
-                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $evaluacionKm['condicion'] === 'Vencido' ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200' }}">
-                                            @if ($evaluacionKm['condicion'] === 'Vencido')
-                                                Km: vencido · {{ number_format(abs($evaluacionKm['kilometros_restantes'])) }} km
-                                            @else
-                                                Km: faltan {{ number_format($evaluacionKm['kilometros_restantes']) }} km
-                                            @endif
-                                        </span>
-                                    @endif
-                                    @if ($alertaFecha)
-                                        @php($diasFecha = (int) now()->startOfDay()->diffInDays($alertaFecha->fecha_mantenimiento, false))
-                                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $diasFecha < 0 ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200' }}">
-                                            @if ($diasFecha < 0)
-                                                Fecha: vencido hace {{ abs($diasFecha) }} {{ abs($diasFecha) === 1 ? 'día' : 'días' }}
-                                            @elseif ($diasFecha === 0)
-                                                Fecha: corresponde hoy
-                                            @else
-                                                Fecha: faltan {{ $diasFecha }} {{ $diasFecha === 1 ? 'día' : 'días' }}
-                                            @endif
-                                        </span>
-                                    @endif
-                                </div>
+                            @if ($alertaActiva)
+                                <span class="inline-flex rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-800 dark:bg-orange-950 dark:text-orange-200">Pendiente</span>
+                            @elseif ($alertaAtendida)
+                                <span class="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800 dark:bg-green-950 dark:text-green-200">Atendida</span>
                             @else
-                                <span class="text-gray-400">—</span>
+                                <span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600 dark:bg-zinc-700 dark:text-zinc-300">Sin alerta</span>
                             @endif
                         </td>
                         <td class="border border-gray-200 px-3 py-2 text-sm dark:border-zinc-700">
