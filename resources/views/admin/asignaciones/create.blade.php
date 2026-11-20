@@ -68,7 +68,7 @@
     @endif
 
     <div class="rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
-        <form action="{{ url('/admin/asignaciones/create') }}" method="POST" autocomplete="off">
+        <form id="form-asignacion" action="{{ url('/admin/asignaciones/create') }}" method="POST" autocomplete="off">
             @csrf
 
             <div class="p-6">
@@ -193,6 +193,59 @@
             selectVehiculo.addEventListener('change', actualizarKilometraje);
             actualizarKilometraje();
         }
+
+        // ---------------------------------------------------------------
+        // Aviso antes de guardar: si el solicitante ya tiene asignaciones activas
+        // (sin devolución), se muestra cuántas son y sus fechas para que se confirme.
+        // ---------------------------------------------------------------
+        const asignacionesPrevias = @json($asignacionesPrevias);
+
+        const formulario = document.getElementById('form-asignacion');
+        const selectSolicitante = document.querySelector('select[name="usuario_id"]');
+
+        // Evita que un destino con símbolos rompa el HTML del aviso
+        function escapar(texto) {
+            const div = document.createElement('div');
+            div.textContent = texto ?? '';
+            return div.innerHTML;
+        }
+
+        formulario.addEventListener('submit', function (evento) {
+            if (!window.Swal || formulario.dataset.confirmado === '1') return;
+
+            const previas = asignacionesPrevias[selectSolicitante.value];
+
+            // Sin asignaciones previas: se guarda directo
+            if (!previas || previas.length === 0) return;
+
+            evento.preventDefault();
+
+            const nombre = selectSolicitante.options[selectSolicitante.selectedIndex].text
+                .replace(/\s+/g, ' ').trim();
+
+            const cantidad = previas.length;
+            const textoCantidad = cantidad === 1 ? '1 asignación activa' : cantidad + ' asignaciones activas';
+
+            const lista = previas.map(function (a) {
+                return '<li style="padding:6px 0;border-bottom:1px solid #e5e7eb;">' +
+                    '<b>' + escapar(a.salida) + '</b> · ' + escapar(a.destino) + '</li>';
+            }).join('');
+
+            Swal.fire({
+                icon: 'info',
+                title: escapar(nombre) + ' ya tiene ' + textoCantidad,
+                html: '<ul style="list-style:none;padding:0;margin:0;text-align:left;font-size:14px;max-height:220px;overflow-y:auto;">' +
+                    lista + '</ul><br>¿Deseas registrar otra asignación?',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, registrar',
+                cancelButtonText: 'Revisar',
+            }).then(function (resultado) {
+                if (resultado.isConfirmed) {
+                    formulario.dataset.confirmado = '1';
+                    formulario.submit();
+                }
+            });
+        });
 
     </script>
 </x-layouts.app>

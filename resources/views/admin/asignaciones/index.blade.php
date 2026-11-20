@@ -45,6 +45,7 @@
     {{-- Filtros (RF-21: historial por vehículo y por solicitante) --}}
     <div class="rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800">
         <form action="{{ url('/admin/asignaciones') }}" method="GET" class="p-4">
+            <flux:heading size="lg" style="margin-bottom: 12px;">Filtros</flux:heading>
             <div class="grid-filtros">
 
                 <div>

@@ -38,12 +38,6 @@ class AsignacionController extends Controller
     private function vehiculosDisponibles()
     {
         return Vehiculo::where('estado', 'Disponible')
-            ->whereNotExists(function ($query) {
-                $query->selectRaw('1')
-                    ->from('asignacion_vehiculos')
-                    ->whereColumn('asignacion_vehiculos.vehiculo_id', 'vehiculos.id_vehiculo')
-                    ->whereNull('asignacion_vehiculos.fecha_regreso');
-            })
             ->orderBy('numero_economico')
             ->get();
     }
@@ -74,8 +68,9 @@ class AsignacionController extends Controller
      */
     public function index(Request $request)
     {
+        // Orden de registro: la primera asignación creada va arriba y las nuevas se agregan abajo
         $consulta = AsignacionVehiculo::with(['vehiculo', 'solicitante'])
-            ->orderByDesc('fecha_salida');
+            ->orderBy('id_asignacion');
 
         if ($request->filled('vehiculo')) {
             $consulta->where('vehiculo_id', $request->vehiculo);
@@ -119,7 +114,19 @@ class AsignacionController extends Controller
             fn ($v) => [$v->id_vehiculo => (float) $v->{self::COL_KM}]
         );
 
-        return view('admin.asignaciones.create', compact('vehiculos', 'solicitantes', 'kilometrajes'));
+        // Asignaciones vigentes (sin devolución) de cada solicitante, para avisar antes de guardar.
+        // Las ya devueltas no se incluyen: esas ya culminaron.
+        $asignacionesPrevias = AsignacionVehiculo::activas()
+            ->whereIn('usuario_id', $solicitantes->pluck('id'))
+            ->orderBy('fecha_salida')
+            ->get()
+            ->groupBy('usuario_id')
+            ->map(fn ($grupo) => $grupo->map(fn ($a) => [
+                'salida'  => $a->fecha_salida->format('d/m/Y h:i A'),
+                'destino' => $a->destino_vehiculo,
+            ])->values());
+
+        return view('admin.asignaciones.create', compact('vehiculos', 'solicitantes', 'kilometrajes', 'asignacionesPrevias'));
     }
 
     /**
@@ -256,7 +263,7 @@ class AsignacionController extends Controller
 
         // La fecha de regreso y el kilometraje final solo existen si ya hubo devolución
         if ($finalizada) {
-            $reglas['fecha_regreso']     = 'required|date|before_or_equal:now|after_or_equal:fecha_salida';
+            $reglas['fecha_regreso']     = 'required|date|after_or_equal:fecha_salida';
             $reglas['kilometraje_final'] = 'required|integer|min:' . $asignacion->kilometraje_inicial;
         }
 
@@ -267,7 +274,6 @@ class AsignacionController extends Controller
             'max'                           => 'Máximo :max caracteres.',
             'usuario_id.exists'             => 'El solicitante seleccionado no existe.',
             'fecha_salida.before_or_equal'  => 'No se puede programar una salida con más de ' . self::DIAS_ANTICIPACION . ' días de anticipación.',
-            'fecha_regreso.before_or_equal' => 'La fecha de regreso no puede ser futura.',
             'fecha_regreso.after_or_equal'  => 'La fecha de regreso no puede ser anterior a la de salida.',
             'kilometraje_final.min'         => 'No puede ser menor al kilometraje inicial ('
                 . number_format($asignacion->kilometraje_inicial) . ' km).',
@@ -387,7 +393,7 @@ class AsignacionController extends Controller
 
         $request->validate([
             // Debe ser posterior a la salida y no futura
-            'fecha_regreso'     => 'required|date|before_or_equal:now|after_or_equal:'
+            'fecha_regreso'     => 'required|date|after_or_equal:'
                 . $asignacion->fecha_salida->format('Y-m-d H:i:s'),
             // RN-06: el kilometraje final no puede ser menor al inicial
             'kilometraje_final' => 'required|integer|min:' . $asignacion->kilometraje_inicial,
@@ -397,7 +403,6 @@ class AsignacionController extends Controller
             'required'                       => 'Este campo es obligatorio.',
             'integer'                        => 'Escribe un número entero.',
             'date'                           => 'Escribe una fecha y hora válidas.',
-            'fecha_regreso.before_or_equal'  => 'La fecha de regreso no puede ser futura.',
             'fecha_regreso.after_or_equal'   => 'La fecha de regreso no puede ser anterior a la salida ('
                 . $asignacion->fecha_salida->format('d/m/Y h:i A') . ').',
             'kilometraje_final.min'          => 'No puede ser menor al kilometraje inicial ('
