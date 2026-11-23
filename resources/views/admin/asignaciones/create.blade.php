@@ -40,8 +40,20 @@
     </style>
 
     @php
+        // Verificar si existen vehículos disponibles y solicitantes activos
         $sinVehiculos = $vehiculos->isEmpty();
         $sinSolicitantes = $solicitantes->isEmpty();
+
+        // Obtener el ID, marca, modelo y año de cada vehículo.
+        $datosVehiculos = $vehiculos->mapWithKeys(function ($vehiculo) {
+            return [
+                $vehiculo->id_vehiculo => [
+                    'marca' => $vehiculo->marca,
+                    'modelo' => $vehiculo->modelo,
+                    'anio' => $vehiculo->anio,
+                ]
+            ];
+        });
     @endphp
 
     <div class="relative mb-6 w-full">
@@ -88,6 +100,10 @@
                                 </flux:select.option>
                             @endforeach
                         </flux:select>
+
+                        <p id="vehiculo-hint" style="font-size:12px;color:#94a3b8;margin-top:4px;">
+                            Selecciona un vehículo para consultar su marca, modelo y año.
+                        </p>
                         <flux:error name="vehiculo_id" />
                     </div>
 
@@ -169,10 +185,35 @@
         // Kilometraje vigente de cada vehículo disponible
         const kilometrajes = @json($kilometrajes);
 
+        // Recibir la información de marca, modelo y año.
+        const datosVehiculos = @json($datosVehiculos);
+
+        // ELEMENTOS DEL FORMULARIO
         const selectVehiculo = document.querySelector('select[name="vehiculo_id"]');
         const inputKm = document.querySelector('input[name="kilometraje_inicial"]');
         const pista = document.getElementById('km-hint');
 
+        // FUNCIÓN PARA OBTENER INFORMACIÓN DEL VEHÍCULO
+        function obtenerInformacionVehiculo() {
+
+            if (!selectVehiculo) return;
+            const vehiculoId = selectVehiculo.value;
+            const vehiculo = datosVehiculos[vehiculoId];
+            const pistaVehiculo = document.getElementById('vehiculo-hint');
+
+            if (vehiculo) {
+                pistaVehiculo.textContent =
+                    'Marca: ' + vehiculo.marca +
+                    ' | Modelo: ' + vehiculo.modelo +
+                    ' | Año: ' + vehiculo.anio;
+
+            } else {
+                pistaVehiculo.textContent =
+                    'Selecciona un vehículo para consultar su marca, modelo y año.';
+            }
+        }
+
+        // FUNCIÓN PARA ACTUALIZAR KILOMETRAJE
         function actualizarKilometraje() {
             if (!selectVehiculo || !inputKm) return;
 
@@ -190,7 +231,16 @@
         }
 
         if (selectVehiculo) {
-            selectVehiculo.addEventListener('change', actualizarKilometraje);
+            selectVehiculo.addEventListener('change', function () {
+
+                // Ejecutar la función que muestra marca, modelo y año.
+                obtenerInformacionVehiculo();
+
+                // Ejecutar la función que actualiza el kilometraje.
+                actualizarKilometraje();
+
+            });
+            obtenerInformacionVehiculo();
             actualizarKilometraje();
         }
 
@@ -228,7 +278,7 @@
 
             const lista = previas.map(function (a) {
                 return '<li style="padding:6px 0;border-bottom:1px solid #e5e7eb;">' +
-                    '<b>' + escapar(a.salida) + '</b> · ' + escapar(a.destino) + '</li>';
+                    '<b>' + escapar(a.salida) + '</b> · ' + escapar(a.destino) + '</b> · ' + escapar(a.motivo_uso) +'</li>';
             }).join('');
 
             Swal.fire({

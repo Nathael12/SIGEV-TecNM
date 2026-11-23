@@ -155,6 +155,7 @@ class AsignacionController extends Controller
             ->map(fn ($grupo) => $grupo->map(fn ($a) => [
                 'salida'  => $a->fecha_salida->format('d/m/Y h:i A'),
                 'destino' => $a->destino_vehiculo,
+                'motivo_uso' => $a->motivo_uso,
             ])->values());
 
         return view('admin.asignaciones.create', compact('vehiculos', 'solicitantes', 'kilometrajes', 'asignacionesPrevias'));
