@@ -1,11 +1,12 @@
 <x-layouts.app title="Editar vehículo">
+    <x-sweetalert-flash />
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Editar vehículo</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <form action="{{ route('admin.vehiculos.update', $vehiculo->getKey()) }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+        <form action="{{ route('admin.vehiculos.update', $vehiculo->getKey()) }}" method="POST" enctype="multipart/form-data" autocomplete="off" data-submit-loading="1" data-loading-text="Guardando cambios...">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">

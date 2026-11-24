@@ -205,35 +205,26 @@
 
                     {{-- ALERTAS: encabezado fijo, contenido con scroll interno --}}
                     @php($totalAlertas = $alertasMantenimiento->count())
-                    <section aria-labelledby="alertas-title" class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-                        <header class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-zinc-800">
-                            <div class="flex min-w-0 items-center gap-2.5">
-                                <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300"><flux:icon name="bell-alert" class="size-5" /></span>
-                                <div class="min-w-0">
-                                    <h2 id="alertas-title" class="truncate text-sm font-bold text-slate-900 dark:text-white">Alertas de mantenimiento</h2>
-                                    <p class="truncate text-[11px] text-slate-500 dark:text-zinc-400">Vencimientos y servicios próximos</p>
-                                </div>
+                    <x-tarjeta-alertas
+                        id="alertas-mantenimiento"
+                        titulo="Alertas de mantenimiento"
+                        subtitulo="Vencimientos y servicios próximos"
+                        icono="bell-alert"
+                        clase-icono="bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300"
+                        :contador="$totalAlertas"
+                        :etiqueta-contador="$totalAlertas === 1 ? 'activa' : 'activas'">
+                        <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
+
+                        @if ($totalAlertas === 0)
+                            <div class="flex flex-col items-center gap-2 rounded-xl bg-emerald-50/60 px-4 py-8 text-center dark:bg-emerald-950/20">
+                                <span class="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300"><flux:icon name="check-circle" class="size-6" /></span>
+                                <p class="text-sm font-semibold text-slate-800 dark:text-zinc-100">Todo en orden</p>
+                                <p class="text-xs text-slate-500 dark:text-zinc-400">No hay mantenimientos pendientes de atención.</p>
                             </div>
-                            <span @class([
-                                'shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold',
-                                'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-200' => $totalAlertas > 0,
-                                'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200' => $totalAlertas === 0,
-                            ])>{{ $totalAlertas }} {{ $totalAlertas === 1 ? 'activa' : 'activas' }}</span>
-                        </header>
+                        @endif
+                    </x-tarjeta-alertas>
 
-                        <div class="max-h-[22rem] space-y-2 overflow-y-auto p-3 [scrollbar-width:thin]">
-                            <x-alertas-mantenimiento :alertas="$alertasMantenimiento" />
-                            <x-alertas-documentos />
-
-                            @if ($totalAlertas === 0)
-                                <div class="flex flex-col items-center gap-2 rounded-xl bg-emerald-50/60 px-4 py-8 text-center dark:bg-emerald-950/20">
-                                    <span class="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300"><flux:icon name="check-circle" class="size-6" /></span>
-                                    <p class="text-sm font-semibold text-slate-800 dark:text-zinc-100">Todo en orden</p>
-                                    <p class="text-xs text-slate-500 dark:text-zinc-400">No hay mantenimientos pendientes de atención.</p>
-                                </div>
-                            @endif
-                        </div>
-                    </section>
+                    <x-alertas-documentos />
                 </aside>
             </div>
 

@@ -1,12 +1,10 @@
 <x-layouts.app title="Ficha del vehículo">
+    <x-sweetalert-flash />
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Ficha del vehículo</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        @if (session('mensaje'))
-            <div class="m-6 mb-0 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
-        @endif
         <div class="p-6 pb-0">
             @if ($fotografiaUrl)
                 <img src="{{ $fotografiaUrl }}" alt="Fotografía de {{ $vehiculo->marca }} {{ $vehiculo->modelo }}" class="max-h-96 w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain dark:border-zinc-700 dark:bg-zinc-900">

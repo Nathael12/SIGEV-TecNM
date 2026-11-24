@@ -1,5 +1,7 @@
 @props(['alertas'])
 
+<x-sweetalert-flash />
+
 <section aria-label="Alertas de mantenimiento" class="space-y-2">
     @forelse ($alertas as $grupo)
         @php($mantenimiento = $grupo->first()->mantenimiento)
@@ -40,12 +42,17 @@
                 </div>
             </div>
             @can('atender alertas mantenimiento')
-                <form method="POST" action="{{ route('admin.alertas.atender', $grupo->first()->id) }}" class="shrink-0 self-end sm:self-center" onsubmit="return confirm('¿Marcar como atendida esta alerta? Esto no registrará un mantenimiento nuevo.')">
+                <form method="POST" action="{{ route('admin.alertas.atender', $grupo->first()->id) }}" class="shrink-0 self-end sm:self-center" data-swal-confirm="1" data-swal-title="Finalizar mantenimiento" data-swal-text="¿Marcar el mantenimiento como finalizado? El vehículo quedará Disponible, salvo que tenga otro servicio abierto o una condición que impida su disponibilidad." data-swal-confirm-text="Atender alerta" data-swal-color="#16a34a" data-swal-icon="question">
                     @csrf
                     <button type="submit" @disabled(! $fechaProxima) class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">Marcar como atendida</button>
                     @if (! $fechaProxima)
                         <p class="mt-1 max-w-56 text-right text-xs text-amber-700 dark:text-amber-300">Registra la fecha del próximo mantenimiento para poder atender esta alerta</p>
                     @endif
+                </form>
+                <form method="POST" action="{{ route('admin.alertas.destroy', $grupo->first()->id) }}" class="shrink-0 self-end sm:self-center" data-swal-confirm="1" data-swal-title="Eliminar alerta" data-swal-text="¿Eliminar únicamente esta alerta? El estado del mantenimiento no cambiará." data-swal-confirm-text="Eliminar alerta" data-swal-color="#dc2626" data-swal-icon="warning">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-700 shadow-sm transition hover:bg-red-50 dark:border-red-900 dark:bg-zinc-900 dark:text-red-300 dark:hover:bg-red-950">Eliminar alerta</button>
                 </form>
             @endcan
         </article>

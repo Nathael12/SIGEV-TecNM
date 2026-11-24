@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Vehiculo;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,7 +96,7 @@ class VehiculoController extends Controller
             report($exception);
 
             return back()->withInput()->withErrors([
-                'fotografia' => 'No se pudo registrar el vehículo. Revisa los datos e inténtalo de nuevo.',
+                'registro' => 'No se pudo registrar el vehículo: '.$exception->getMessage(),
             ]);
         }
 
@@ -149,6 +150,7 @@ class VehiculoController extends Controller
         unset($datos['fotografia']);
         $datos = $this->mapearColumnasVehiculo($datos);
         $fotografiaAnterior = $vehiculo->fotografia;
+        $rutaFotografia = null;
         if ($request->hasFile('fotografia')) {
             $rutaFotografia = $request->file('fotografia')->store('vehiculos', 'public');
             if (! $rutaFotografia) {
@@ -158,7 +160,26 @@ class VehiculoController extends Controller
             $datos['fotografia'] = $rutaFotografia;
         }
 
-        $vehiculo->update($datos);
+        try {
+            DB::transaction(fn () => $vehiculo->update($datos));
+        } catch (UniqueConstraintViolationException $exception) {
+            if ($rutaFotografia) {
+                Storage::disk('public')->delete($rutaFotografia);
+            }
+
+            return back()->withInput()->withErrors([
+                'registro' => 'No se pudo actualizar el vehículo porque el número económico o las placas ya están registrados.',
+            ]);
+        } catch (Throwable $exception) {
+            if ($rutaFotografia) {
+                Storage::disk('public')->delete($rutaFotografia);
+            }
+            report($exception);
+
+            return back()->withInput()->withErrors([
+                'registro' => 'No se pudo actualizar el vehículo: '.$exception->getMessage(),
+            ]);
+        }
 
         if ($request->hasFile('fotografia') && $fotografiaAnterior) {
             Storage::disk('public')->delete($fotografiaAnterior);
@@ -171,8 +192,32 @@ class VehiculoController extends Controller
     public function destroy(string $id)
     {
         $vehiculo = Vehiculo::findOrFail($id);
+
+        if ($vehiculo->mantenimientos()->exists()) {
+            return redirect()->route('admin.vehiculos.index')->with('advertencia',
+                'No se puede eliminar el vehículo '.$vehiculo->numero_economico.' porque tiene mantenimientos asociados.');
+        }
+
+        if ($vehiculo->asignaciones()->whereNull('fecha_regreso')->exists()) {
+            return redirect()->route('admin.vehiculos.index')->with('advertencia',
+                'No se puede eliminar el vehículo '.$vehiculo->numero_economico.' porque tiene una asignación activa.');
+        }
+
+        if ($vehiculo->asignaciones()->exists()) {
+            return redirect()->route('admin.vehiculos.index')->with('advertencia',
+                'No se puede eliminar el vehículo '.$vehiculo->numero_economico.' porque conserva historial de asignaciones.');
+        }
+
         $fotografia = $vehiculo->fotografia;
-        $vehiculo->delete();
+        try {
+            DB::transaction(fn () => $vehiculo->delete());
+        } catch (QueryException $exception) {
+            report($exception);
+
+            return redirect()->route('admin.vehiculos.index')->with('error',
+                'No se pudo eliminar el vehículo debido a una restricción de la base de datos: '.$exception->getMessage());
+        }
+
         if ($fotografia) {
             Storage::disk('public')->delete($fotografia);
         }

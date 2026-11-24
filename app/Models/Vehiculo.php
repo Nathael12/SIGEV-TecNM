@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class Vehiculo extends Model
@@ -46,6 +47,42 @@ class Vehiculo extends Model
     public function mantenimientos(): HasMany
     {
         return $this->hasMany(Mantenimiento::class, 'vehiculo_id', 'id_vehiculo');
+    }
+
+    public function sincronizarEstadoMantenimiento(): bool
+    {
+        $tieneMantenimientoAbierto = $this->mantenimientos()
+            ->whereIn('estado_mantenimiento', ['pendiente', 'en_proceso'])
+            ->exists();
+
+        if ($this->asignaciones()->whereNull('fecha_regreso')->exists()) {
+            return false;
+        }
+
+        $estadoActual = $this->getAttribute('estado');
+        if ($tieneMantenimientoAbierto) {
+            if (! in_array($estadoActual, ['Disponible', 'En mantenimiento'], true)) {
+                return false;
+            }
+            $estadoNuevo = 'En mantenimiento';
+        } else {
+            if ($estadoActual !== 'En mantenimiento') {
+                return false;
+            }
+            $estadoNuevo = 'Disponible';
+        }
+
+        if ($estadoNuevo === $estadoActual) {
+            return false;
+        }
+
+        DB::table($this->getTable())
+            ->where($this->getKeyName(), $this->getKey())
+            ->update(['estado' => $estadoNuevo]);
+
+        $this->setAttribute('estado', $estadoNuevo);
+
+        return true;
     }
 
     public function asignaciones(): HasMany

@@ -3,9 +3,7 @@
         <flux:heading size="xl" level="1">Vehículos</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
-    @if (session('mensaje'))
-        <div class="mb-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ session('mensaje') }}</div>
-    @endif
+    <x-sweetalert-flash />
     <div class="flex justify-end">
         <a href="{{ route('admin.vehiculos.create') }}" class="inline-flex items-center rounded bg-blue-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-600"><i class="fas fa-plus mr-2"></i> Registrar vehículo</a>
     </div>
@@ -54,7 +52,7 @@
                                 @endcan
 
                                 <a href="{{ route('admin.vehiculos.edit', $vehiculo->getKey()) }}" class="inline-flex items-center rounded bg-amber-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-amber-600"><i class="fas fa-pen mr-2"></i> Editar</a>
-                                <form action="{{ route('admin.vehiculos.destroy', $vehiculo->getKey()) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este vehículo? Esta acción no se puede deshacer.');">
+                                <form action="{{ route('admin.vehiculos.destroy', $vehiculo->getKey()) }}" method="POST" data-swal-confirm="1" data-swal-title="Eliminar vehículo" data-swal-text="¿Eliminar el vehículo {{ $vehiculo->numero_economico }}? Esta acción no se puede deshacer." data-swal-confirm-text="Eliminar vehículo" data-swal-color="#dc2626" data-swal-icon="warning">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center rounded bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700"><i class="fas fa-trash mr-2"></i> Eliminar</button>
