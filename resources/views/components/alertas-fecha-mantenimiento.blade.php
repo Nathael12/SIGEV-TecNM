@@ -1,5 +1,7 @@
 @props(['alertas'])
 
+<x-sweetalert-flash />
+
 @if ($alertas->isNotEmpty())
     <section aria-label="Alertas por fecha de mantenimiento" class="space-y-2">
         @foreach ($alertas->take(3) as $alerta)

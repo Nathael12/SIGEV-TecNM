@@ -15,14 +15,8 @@
 
         $vencidos = $alertas->filter(fn ($d) => $d->estado_vigencia === 'Vencido')->count();
         $porVencer = $alertas->count() - $vencidos;
-        $hayDocumentos = \App\Models\Documento::exists();
         $maximo = 5;
         $puedeVerDetalle = auth()->user()->can('ver detalle documento');
-
-        $estilos = [
-            'Vencido' => 'background-color:#fee2e2;color:#b91c1c',
-            'Por vencer' => 'background-color:#fef3c7;color:#b45309',
-        ];
 
         $textoDias = function ($documento) {
             $dias = (int) now()->startOfDay()->diffInDays($documento->vigencia_fin, false);
@@ -39,86 +33,74 @@
         };
     @endphp
 
-    @if ($hayDocumentos)
-        <section aria-label="Alertas de documentos" class="space-y-4">
-            <div>
-                <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Documentos de vehículos</h2>
-                <p class="mt-1 text-sm text-slate-600 dark:text-zinc-400">
-                    Alertas de vigencia (se avisa {{ \App\Models\Documento::DIAS_ALERTA }} días antes del vencimiento).
-                </p>
-            </div>
+    <x-tarjeta-alertas
+        id="alertas-documentos"
+        titulo="Documentos de vehículos"
+        subtitulo="Alertas de vigencia (30 días antes del vencimiento)"
+        icono="document-text"
+        clase-icono="bg-sky-50 text-sky-600 dark:bg-sky-950 dark:text-sky-300"
+        :contador="$alertas->count()"
+        :etiqueta-contador="$alertas->count() === 1 ? 'activa' : 'activas'">
 
-            <div class="grid gap-4 sm:grid-cols-2">
-                <article
-                    class="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-                    <span
-                        style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:16px;flex-shrink:0;background-color:#fee2e2;color:#b91c1c;">
-                        <flux:icon name="x-circle" class="size-5" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-3xl font-bold leading-none tracking-tight text-slate-900 dark:text-white">
-                            {{ $vencidos }}</p>
-                        <h3 class="mt-2 truncate text-sm font-semibold text-slate-600 dark:text-zinc-300">Documentos
-                            vencidos</h3>
+        <div class="grid grid-cols-2 gap-2">
+            <article class="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-300">
+                    <flux:icon name="x-circle" class="size-5" />
+                </span>
+                <div class="min-w-0">
+                    <p class="text-xl font-bold leading-none tracking-tight text-slate-900 dark:text-white">{{ $vencidos }}</p>
+                    <h3 class="mt-1 text-xs font-semibold text-slate-600 dark:text-zinc-300">Vencidos</h3>
+                </div>
+            </article>
+            <article class="flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-300">
+                    <flux:icon name="exclamation-triangle" class="size-5" />
+                </span>
+                <div class="min-w-0">
+                    <p class="text-xl font-bold leading-none tracking-tight text-slate-900 dark:text-white">{{ $porVencer }}</p>
+                    <h3 class="mt-1 text-xs font-semibold text-slate-600 dark:text-zinc-300">Por vencer</h3>
+                </div>
+            </article>
+        </div>
+
+        @forelse ($alertas->take($maximo) as $documento)
+            @php($vencido = $documento->estado_vigencia === 'Vencido')
+            <article role="status" class="maintenance-alert {{ $vencido ? 'maintenance-alert--red' : 'maintenance-alert--amber' }} flex-wrap">
+                <div class="min-w-0 flex-1 space-y-1">
+                    <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-tight">
+                        <strong>{{ $documento->vehiculo->numero_economico }} · {{ $documento->vehiculo->placas }}</strong>
                     </div>
-                </article>
-
-                <article
-                    class="flex items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-                    <span
-                        style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:16px;flex-shrink:0;background-color:#fef3c7;color:#b45309;">
-                        <flux:icon name="exclamation-triangle" class="size-5" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-3xl font-bold leading-none tracking-tight text-slate-900 dark:text-white">
-                            {{ $porVencer }}</p>
-                        <h3 class="mt-2 truncate text-sm font-semibold text-slate-600 dark:text-zinc-300">Documentos
-                            por vencer</h3>
+                    <div class="flex flex-col gap-0.5 text-xs sm:flex-row sm:flex-wrap sm:gap-x-2">
+                        <span class="font-medium {{ $vencido ? 'text-red-900 dark:text-red-200' : 'text-amber-900 dark:text-amber-200' }}">
+                            {{ $documento->vigencia_fin->format('d/m/Y') }} · {{ $textoDias($documento) }}
+                        </span>
+                        <span class="text-slate-600 dark:text-zinc-300">{{ $documento->descripcion_documento }}</span>
                     </div>
-                </article>
+                </div>
+                <div class="flex shrink-0 flex-wrap items-center gap-2 self-end sm:self-center">
+                    <span @class([
+                        'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold',
+                        'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200' => $vencido,
+                        'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200' => ! $vencido,
+                    ])>{{ $documento->estado_vigencia }}</span>
+                    <a href="{{ $puedeVerDetalle ? url('/admin/documento/' . $documento->id_documento) : url('/admin/documentos?vehiculo=' . $documento->vehiculo_id) }}"
+                        class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                        <i class="fas fa-eye mr-2"></i> Revisar
+                    </a>
+                </div>
+            </article>
+        @empty
+            <div class="flex flex-col items-center gap-2 rounded-xl bg-emerald-50/60 px-4 py-8 text-center dark:bg-emerald-950/20">
+                <span class="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300"><flux:icon name="check-circle" class="size-6" /></span>
+                <p class="text-sm font-semibold text-slate-800 dark:text-zinc-100">Todo en orden</p>
+                <p class="text-xs text-slate-500 dark:text-zinc-400">No hay documentos por vencer ni vencidos.</p>
             </div>
+        @endforelse
 
-            <div
-                class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-                @forelse ($alertas->take($maximo) as $documento)
-                    <div
-                        style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;{{ $loop->first ? '' : 'border-top:1px solid rgba(148,163,184,.25);' }}">
-                        <div style="min-width:0;">
-                            <p class="text-sm font-semibold text-slate-900 dark:text-white">
-                                {{ $documento->vehiculo->numero_economico }} · {{ $documento->vehiculo->placas }}
-                            </p>
-                            <p class="text-sm text-slate-600 dark:text-zinc-400">
-                                {{ $documento->descripcion_documento }}
-                            </p>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                            <span class="text-sm text-slate-600 dark:text-zinc-400">
-                                {{ $documento->vigencia_fin->format('d/m/Y') }} · {{ $textoDias($documento) }}
-                            </span>
-                            <span style="{{ $estilos[$documento->estado_vigencia] }}"
-                                class="inline-block px-3 py-1 text-xs font-semibold rounded-full">
-                                {{ $documento->estado_vigencia }}
-                            </span>
-                            <a href="{{ $puedeVerDetalle ? url('/admin/documento/' . $documento->id_documento) : url('/admin/documentos?vehiculo=' . $documento->vehiculo_id) }}"
-                                class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded transition">
-                                <i class="fas fa-eye mr-2"></i> Revisar
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-sm text-slate-600 dark:text-zinc-400" style="display:flex;align-items:center;gap:8px;">
-                        <i class="fas fa-check-circle" style="color:#15803d"></i>
-                        Todos los documentos están vigentes.
-                    </p>
-                @endforelse
-
-                @if ($alertas->count() > $maximo)
-                    <p class="text-sm text-slate-600 dark:text-zinc-400"
-                        style="margin-top:12px;border-top:1px solid rgba(148,163,184,.25);padding-top:12px;">
-                        y {{ $alertas->count() - $maximo }} más. Revísalos desde la Documentación de cada vehículo.
-                    </p>
-                @endif
-            </div>
-        </section>
-    @endif
+        @if ($alertas->count() > $maximo)
+            <p class="maintenance-alert border-slate-200 bg-slate-50 text-slate-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
+                y {{ $alertas->count() - $maximo }} más. Revísalos desde la Documentación de cada vehículo.
+            </p>
+        @endif
+    </x-tarjeta-alertas>
 @endcan

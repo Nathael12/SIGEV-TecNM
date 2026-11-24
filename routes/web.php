@@ -31,6 +31,7 @@ require __DIR__.'/auth.php';
 Route::get('/dashboard', function () { return redirect()->route('admin.index'); })->name('dashboard')->middleware(['auth', 'can:ver dashboard']);
 Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware(['auth', 'can:ver dashboard']);
 Route::post('/admin/alertas-mantenimiento/{alerta}/atender', [App\Http\Controllers\AlertaMantenimientoController::class, 'atender'])->name('admin.alertas.atender')->middleware(['auth', 'can:atender alertas mantenimiento']);
+Route::delete('/admin/alertas-mantenimiento/{alerta}', [App\Http\Controllers\AlertaMantenimientoController::class, 'destroy'])->name('admin.alertas.destroy')->middleware(['auth', 'can:atender alertas mantenimiento']);
 
 
 //rutas para ajustes
@@ -74,6 +75,7 @@ Route::get('/admin/mantenimientos/create', [App\Http\Controllers\MantenimientoCo
 Route::post('/admin/mantenimientos', [App\Http\Controllers\MantenimientoController::class, 'store'])->name('admin.mantenimientos.store')->middleware(['auth', 'can:guardar mantenimiento']);
 Route::get('/admin/mantenimientos/{mantenimiento}/edit', [App\Http\Controllers\MantenimientoController::class, 'edit'])->name('admin.mantenimientos.edit')->middleware(['auth', 'can:editar mantenimiento']);
 Route::put('/admin/mantenimientos/{mantenimiento}', [App\Http\Controllers\MantenimientoController::class, 'update'])->name('admin.mantenimientos.update')->middleware(['auth', 'can:actualizar mantenimiento']);
+Route::post('/admin/mantenimientos/{mantenimiento}/finalizar', [App\Http\Controllers\MantenimientoController::class, 'finalizar'])->name('admin.mantenimientos.finalizar')->middleware(['auth', 'can:actualizar mantenimiento']);
 Route::delete('/admin/mantenimientos/{mantenimiento}', [App\Http\Controllers\MantenimientoController::class, 'destroy'])->name('admin.mantenimientos.destroy')->middleware(['auth', 'can:eliminar mantenimiento']);
 
 

@@ -1,11 +1,12 @@
 <x-layouts.app title="Registrar mantenimiento">
+    <x-sweetalert-flash />
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Registrar mantenimiento</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <form action="{{ route('admin.mantenimientos.store') }}" method="POST" autocomplete="off">
+        <form id="form-registro-mantenimiento" action="{{ route('admin.mantenimientos.store') }}" method="POST" autocomplete="off" data-submit-loading="1" data-loading-text="Guardando mantenimiento...">
             @csrf
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="sm:col-span-2 lg:col-span-3">
@@ -16,6 +17,11 @@
                             <flux:select.option value="{{ $vehiculo->getKey() }}" :selected="(string) old('vehiculo_id') === (string) $vehiculo->getKey()">{{ $vehiculo->numero_economico }} — {{ $vehiculo->marca }} {{ $vehiculo->modelo }} — {{ $vehiculo->placas }}</flux:select.option>
                         @endforeach
                     </flux:select>
+                    @if ($vehiculos->isEmpty())
+                        <p class="mt-2 text-sm text-amber-700 dark:text-amber-300">No hay vehículos disponibles para mantenimiento. Primero finaliza cualquier asignación activa.</p>
+                    @else
+                        <p class="mt-2 text-xs text-gray-500 dark:text-zinc-400">Los vehículos con una asignación activa no aparecen en esta lista.</p>
+                    @endif
                     <flux:error name="vehiculo_id" />
                 </div>
                 <div><flux:label>Fecha del mantenimiento <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="fecha_mantenimiento" type="date" value="{{ old('fecha_mantenimiento') }}" required /> --><flux:input name="fecha_mantenimiento" type="date" value="{{ old('fecha_mantenimiento') }}" required placeholder="AAAA-MM-DD" /><flux:error name="fecha_mantenimiento" /></div>
@@ -28,7 +34,7 @@
             </div>
             <div class="flex justify-end gap-2 px-6 pb-6">
                 <a href="{{ route('admin.mantenimientos.index') }}" class="inline-flex items-center rounded bg-gray-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-600">Cancelar</a>
-                <flux:button variant="primary" type="submit" color="blue">Guardar mantenimiento</flux:button>
+                <flux:button id="btn-guardar-mantenimiento" variant="primary" type="submit" color="blue">Guardar mantenimiento</flux:button>
             </div>
         </form>
     </div>

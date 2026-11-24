@@ -1,11 +1,12 @@
 <x-layouts.app title="Editar mantenimiento">
+    <x-sweetalert-flash />
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Editar mantenimiento</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <form action="{{ route('admin.mantenimientos.update', $mantenimiento) }}" method="POST" autocomplete="off">
+        <form action="{{ route('admin.mantenimientos.update', $mantenimiento) }}" method="POST" autocomplete="off" data-submit-loading="1" data-loading-text="Guardando cambios...">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -20,6 +21,15 @@
                         @endforeach
                     </flux:select>
                     <flux:error name="vehiculo_id" />
+                </div>
+                <div>
+                    <flux:label>Estado del mantenimiento</flux:label>
+                    <flux:select name="estado_mantenimiento" required>
+                        <flux:select.option value="pendiente" :selected="old('estado_mantenimiento', $mantenimiento->estado_mantenimiento) === 'pendiente'">Pendiente</flux:select.option>
+                        <flux:select.option value="realizado" :selected="in_array(old('estado_mantenimiento', $mantenimiento->estado_mantenimiento), ['realizado', 'finalizado'], true)">Finalizado</flux:select.option>
+                        <flux:select.option value="cancelado" :selected="old('estado_mantenimiento', $mantenimiento->estado_mantenimiento) === 'cancelado'">Cancelado</flux:select.option>
+                    </flux:select>
+                    <flux:error name="estado_mantenimiento" />
                 </div>
                 <div><flux:label>Fecha del mantenimiento <span class="text-red-500">(*)</span></flux:label><flux:input name="fecha_mantenimiento" type="date" value="{{ old('fecha_mantenimiento', $mantenimiento->fecha_mantenimiento->format('Y-m-d')) }}" required /><flux:error name="fecha_mantenimiento" /></div>
                 <div><flux:label>Kilometraje del vehículo</flux:label><flux:input id="kilometraje-mantenimiento" type="text" value="{{ $kilometrajeMostrado !== null ? number_format((int) $kilometrajeMostrado) . ' km' : 'Kilometraje no disponible' }}" readonly /></div>

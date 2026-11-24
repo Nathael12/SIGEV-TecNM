@@ -1,11 +1,12 @@
 <x-layouts.app title="Registrar vehículo">
+    <x-sweetalert-flash />
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Registrar vehículo</flux:heading>
         <br><flux:separator variant="subtle" />
     </div>
 
     <div class="rounded-lg border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <form id="form-registro-vehiculo" action="{{ route('admin.vehiculos.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+        <form id="form-registro-vehiculo" action="{{ route('admin.vehiculos.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" data-submit-loading="1" data-loading-text="Guardando vehículo...">
             @csrf
             <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div><flux:label>Número económico <span class="text-red-500">(*)</span></flux:label><!-- <flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required /> --><flux:input name="numero_economico" value="{{ old('numero_economico') }}" icon="hashtag" required placeholder="Ej. VEH-001" /><flux:error name="numero_economico" /></div>
@@ -62,27 +63,6 @@
 
 <script>
     (() => {
-        const form = document.getElementById('form-registro-vehiculo');
-        const submitButton = document.getElementById('guardar-vehiculo');
-        const submitLabel = submitButton?.querySelector('[data-submit-label]');
-        const submitSpinner = submitButton?.querySelector('[data-submit-spinner]');
-        let enviando = false;
-
-        form?.addEventListener('submit', (event) => {
-            if (enviando) {
-                event.preventDefault();
-                return;
-            }
-
-            enviando = true;
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.setAttribute('aria-busy', 'true');
-            }
-            if (submitLabel) submitLabel.textContent = 'Guardando...';
-            submitSpinner?.classList.remove('hidden');
-        });
-
         const input = document.getElementById('fotografia');
         const preview = document.getElementById('fotografia-preview');
         const placeholder = document.getElementById('fotografia-placeholder');
