@@ -89,6 +89,10 @@ class RoleSeeder extends Seeder
             'registrar devolucion',
             'ver formulario editar asignacion',
             'actualizar asignacion',
+
+            // Reportes
+            'ver reportes',
+            'exportar reportes',
         ];
 
         foreach ($permisos as $permiso) {
@@ -137,6 +141,10 @@ class RoleSeeder extends Seeder
             'ver detalle asignacion',
             'ver formulario devolucion',
             'registrar devolucion',
+
+            // Reportes
+            'ver reportes',
+            'exportar reportes',
         ]);
 
         //permisos de Solicitantes

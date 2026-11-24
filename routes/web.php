@@ -97,3 +97,15 @@ Route::get('/admin/asignacion/{id}/edit', [App\Http\Controllers\AsignacionContro
 Route::put('/admin/asignacion/{id}', [App\Http\Controllers\AsignacionController::class, 'update'])->name('admin.asignaciones.update')->middleware(['auth', 'can:actualizar asignacion']);
 Route::get('/admin/asignacion/{id}/devolucion', [App\Http\Controllers\AsignacionController::class, 'devolucion'])->name('admin.asignaciones.devolucion')->middleware(['auth', 'can:ver formulario devolucion']);
 Route::put('/admin/asignacion/{id}/devolucion', [App\Http\Controllers\AsignacionController::class, 'devolver'])->name('admin.asignaciones.devolver')->middleware(['auth', 'can:registrar devolucion']);
+
+//rutas para reportes
+Route::get('/admin/reportes', [App\Http\Controllers\ReporteController::class, 'index'])->name('admin.reportes.index')->middleware(['auth', 'can:ver reportes']);
+Route::get('/admin/reportes/flotilla', [App\Http\Controllers\ReporteController::class, 'flotilla'])->name('admin.reportes.flotilla')->middleware(['auth', 'can:ver reportes']);
+Route::get('/admin/reportes/asignaciones', [App\Http\Controllers\ReporteController::class, 'asignaciones'])->name('admin.reportes.asignaciones')->middleware(['auth', 'can:ver reportes']);
+Route::get('/admin/reportes/flotilla/pdf', [App\Http\Controllers\ReporteController::class, 'flotillaPdf'])->name('admin.reportes.flotilla.pdf')->middleware(['auth', 'can:exportar reportes']);
+Route::get('/admin/reportes/flotilla/excel', [App\Http\Controllers\ReporteController::class, 'flotillaExcel'])->name('admin.reportes.flotilla.excel')->middleware(['auth', 'can:exportar reportes']);
+Route::get('/admin/reportes/asignaciones/pdf', [App\Http\Controllers\ReporteController::class, 'asignacionesPdf'])->name('admin.reportes.asignaciones.pdf')->middleware(['auth', 'can:exportar reportes']);
+Route::get('/admin/reportes/asignaciones/excel', [App\Http\Controllers\ReporteController::class, 'asignacionesExcel'])->name('admin.reportes.asignaciones.excel')->middleware(['auth', 'can:exportar reportes']);
+Route::get('/admin/reportes/mantenimientos', [App\Http\Controllers\ReporteController::class, 'mantenimientos'])->name('admin.reportes.mantenimientos')->middleware(['auth', 'can:ver reportes']);
+Route::get('/admin/reportes/mantenimientos/pdf', [App\Http\Controllers\ReporteController::class, 'mantenimientosPdf'])->name('admin.reportes.mantenimientos.pdf')->middleware(['auth', 'can:exportar reportes']);
+Route::get('/admin/reportes/mantenimientos/excel', [App\Http\Controllers\ReporteController::class, 'mantenimientosExcel'])->name('admin.reportes.mantenimientos.excel')->middleware(['auth', 'can:exportar reportes']);

@@ -47,10 +47,12 @@
                     </flux:navlist.item>
                     @endcan
 
-                    <flux:navlist.item icon="document-chart-bar" href="#"
-                        :current="false">
+                    @can('ver reportes')
+                    <flux:navlist.item icon="document-chart-bar" :href="route('admin.reportes.index')"
+                        :current="request()->routeIs('admin.reportes.*')" wire:navigate>
                         {{ __('Reportes') }}
                     </flux:navlist.item>
+                    @endcan
 
                     @can('ver roles')
                         <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
