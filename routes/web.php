@@ -39,6 +39,7 @@ Route::post('/admin/ajustes', [App\Http\Controllers\AjusteController::class, 'st
 
 //rutas para roles
 Route::get('/admin/roles', [App\Http\Controllers\RoleController::class, 'index'])->name('admin.roles.index')->middleware(['auth', 'can:ver roles']);
+Volt::route('/admin/roles/{role}/permisos', 'admin.roles.permisos')->name('admin.roles.permisos')->middleware(['auth', 'can:ver roles', 'can:actualizar rol']);
 Route::get('/admin/roles/create', [App\Http\Controllers\RoleController::class, 'create'])->name('admin.roles.create')->middleware(['auth', 'can:ver formulario crear rol']);
 Route::post('/admin/roles/create', [App\Http\Controllers\RoleController::class, 'store'])->name('admin.roles.create')->middleware(['auth', 'can:guardar rol']);
 Route::get('/admin/rol/{id}', [App\Http\Controllers\RoleController::class, 'show'])->name('admin.roles.show')->middleware(['auth', 'can:ver detalle rol']);
